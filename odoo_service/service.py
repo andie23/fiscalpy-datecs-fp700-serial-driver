@@ -15,31 +15,31 @@ def pdf_to_text(pdf_path):
             text += page_text + "\n"
     return text
 
-def get_pdf_feature_score(features, text_line):
-    for index in features:
+def get_line_index_score(indexes, text_line):
+    for index in indexes:
         pattern = re.compile(re.escape(index), re.IGNORECASE)
         if pattern.search(text_line):
-            return features[index]
+            return indexes[index]
     return 0
 
 def detect_doc_type(text):
-    features = config.get_config("feature_detection")
+    indexes = config.get_config("doc_identification_index")
     receipt_score = 0
     invoice_score = 0
     org_score = 0
 
     for line in text.split('\n'):
-        org_score += get_pdf_feature_score(
-            features["org"], line
+        org_score += get_line_index_score(
+            indexes["org"], line
         )
-        receipt_score += get_pdf_feature_score(
-            features["receipt"], line
+        receipt_score += get_line_index_score(
+            indexes["receipt"], line
         )
-        invoice_score += get_pdf_feature_score(
-            features["invoice"], line
+        invoice_score += get_line_index_score(
+            indexes["invoice"], line
         )
 
-    if org_score < len(features["org"]):
+    if org_score < len(indexes["org"]):
         return None
 
     if receipt_score > invoice_score:

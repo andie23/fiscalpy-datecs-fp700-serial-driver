@@ -15,7 +15,7 @@ DEFAULT_CONFIG = {
         "Cheque": "C",
         "Bank Transfer": "N"
     },
-    "feature_detection": {
+    "doc_identification_index": {
         "org": {
             
         },
