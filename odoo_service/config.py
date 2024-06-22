@@ -3,12 +3,6 @@ import json
 
 CONFIG_FILE = "odoo.config.json"
 DEFAULT_CONFIG = {
-    "org": {
-        "name": "",
-        "tpin": "",
-        "email": "",
-        "vat": ""
-    },
     "esd_mode": True,
     "invoice_directory": "c:\mra",
     "download_folder": "Downloads",
@@ -21,7 +15,10 @@ DEFAULT_CONFIG = {
         "Cheque": "C",
         "Bank Transfer": "N"
     },
-    "features": {
+    "feature_detection": {
+        "org": {
+            
+        },
         "receipt": {
             "POS": 3,
             "Served by": 3,
