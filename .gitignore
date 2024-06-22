@@ -1,0 +1,9 @@
+*.pdf
+*.json
+*.txt
+fp700/dist/*
+odoo_service/build/*
+fp700/build/*
+odoo_service/build/*
+main.spec
+__pycache__
