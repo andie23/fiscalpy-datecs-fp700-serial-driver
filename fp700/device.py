@@ -3,6 +3,7 @@ import time
 import config
 from serial import Serial
 import serial.tools.list_ports
+import protocol_cmd as cmd
 
 class DeviceService:
     def __init__(self):
@@ -49,7 +50,6 @@ class DeviceService:
         return [s.device for s in list(serial.tools.list_ports.comports())]
     
     def get_device_info(self, port=config.get_config("Port")):
-        import protocol_cmd as cmd
         if not self.open(port):
             return None
         try:

@@ -2,7 +2,7 @@
 Python library/SDK for talking to Fp700 devices via Serial connection
 
 # Compiling into EXE
-`pyinstaller --onefile --hidden-import charset_normalizer.md__mypyc fp700.py`
+`pyinstaller --onefile fp700.py`
 
 # Raw commands
 ## Format
@@ -45,7 +45,7 @@ fp700.exe -p c "42::Hello world!"
     "print_copy": false,
     "payment_modes": [
         {
-            "mode": "Cash",
+            "mode": "P",
             "amount": 1.0
         }
     ],
@@ -55,7 +55,7 @@ fp700.exe -p c "42::Hello world!"
             "name": "Bread",
             "price": 1.0,
             "quantity": 1,
-            "abs_discount": "20%",
+            "abs_discount": "20.00",
             "perc_discount": -1800
         }
     ]
