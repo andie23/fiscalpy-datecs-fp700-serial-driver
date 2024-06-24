@@ -44,11 +44,12 @@ K_MATCH = "match"
 K_EXTRACT_GROUP_INDEX = "extract_group_index"
 K_EXCLUDE_PATTERN = "pattern_blacklist"
 K_BREAK_ITERATION = "break_iteration"
-K_VALUE_TYPE = "type"
+K_FORMAT_TYPE = "type"
 K_STR = "LETTERS"
 K_INT = "NUMBER"
 K_FLOAT = "FLOAT"
-
+K_PAYMENT_MODES = "payment_modes"
+K_PRODUCTS = "products"
 PAYMENT_CODES = [
     K_CASH_CODE, 
     K_CREDIT_CODE, 
@@ -70,28 +71,13 @@ DEFAULT_CONFIG = {
             },
             K_TOTAL_QUANTITY: {
                 K_EXTRACT_GROUP_INDEX: 2,
-                K_VALUE_TYPE: K_INT,
+                K_FORMAT_TYPE: K_INT,
                 K_MATCH: "^(Total Product Qty)\\s*(\\d*)"
             },
             K_TOTAL_PRODUCTS: {
                 K_EXTRACT_GROUP_INDEX: 2,
-                K_VALUE_TYPE: K_INT,
+                K_FORMAT_TYPE: K_INT,
                 K_MATCH: "^(Total No. of Products)\\s*(\\d*)"
-            },
-            K_CASH_CODE: {
-                K_EXTRACT_GROUP_INDEX: 2,
-                K_VALUE_TYPE: K_FLOAT,
-                K_MATCH: f"^(Cash|Mobile Money)\\s*({P_MONEY})"
-            },
-            K_CREDIT_CODE: {
-                K_EXTRACT_GROUP_INDEX: 2,
-                K_VALUE_TYPE: K_FLOAT,
-                K_MATCH: f"^(Credit Card|Credit/Debit Card|Bank Transfer)\\s*({P_MONEY})"
-            },
-            K_CHEQUE_CODE: {
-                K_EXTRACT_GROUP_INDEX: 2,
-                K_VALUE_TYPE: K_FLOAT,
-                K_MATCH: f"^(Cheque)\\s*({P_MONEY})"
             },
             K_ORDER_NUMBER: {
                 K_EXTRACT_GROUP_INDEX: 2,
@@ -102,9 +88,26 @@ DEFAULT_CONFIG = {
                 K_MATCH: f"^{P_DATE}$"
             }
         },
-        K_PRODUCT: {
-            K_PRODUCT_START: "^Served by",
-            K_PRODUCT_END: "^TOTAL$",
+        K_PAYMENT_MODES: {
+            K_CASH_CODE: {
+                K_EXTRACT_GROUP_INDEX: 2,
+                K_FORMAT_TYPE: K_FLOAT,
+                K_MATCH: f"^(Cash|Mobile Money)\\s*({P_MONEY})"
+            },
+            K_CREDIT_CODE: {
+                K_EXTRACT_GROUP_INDEX: 2,
+                K_FORMAT_TYPE: K_FLOAT,
+                K_MATCH: f"^(Credit Card|Credit/Debit Card|Bank Transfer)\\s*({P_MONEY})"
+            },
+            K_CHEQUE_CODE: {
+                K_EXTRACT_GROUP_INDEX: 2,
+                K_FORMAT_TYPE: K_FLOAT,
+                K_MATCH: f"^(Cheque)\\s*({P_MONEY})"
+            }
+        },
+        K_PRODUCTS: {
+            K_PRODUCT_START: "^-*$",
+            K_PRODUCT_END: "^-*$",
             K_PRODUCT_TERMINATION: P_QUANTITY_AND_PRICE,
             K_PRODUCT: {
                 K_PRODUCT_CODE: {
@@ -112,29 +115,28 @@ DEFAULT_CONFIG = {
                     K_MATCH: P_PRODUCT_CODE
                 },
                 K_PRODUCT_NAME: {
-                    K_VALUE_TYPE: K_STR,
                     K_EXTRACT_GROUP_INDEX: 0,
                     K_EXCLUDE_PATTERN: f"{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|Line Discount|{P_URL}",
-                    K_MATCH: "\\w*"
+                    K_MATCH: ".*"
                 },
                 K_QUANTITY: {
                     K_EXTRACT_GROUP_INDEX: 1,
-                    K_VALUE_TYPE: K_INT,
+                    K_FORMAT_TYPE: K_INT,
                     K_MATCH: P_QUANTITY_AND_PRICE
                 },
                 K_PRICE: {
                     K_EXTRACT_GROUP_INDEX: 2,
-                    K_VALUE_TYPE: K_FLOAT,
+                    K_FORMAT_TYPE: K_FLOAT,
                     K_MATCH: P_QUANTITY_AND_PRICE
                 },
                 K_TOTAL_BEFORE_DISCOUNT: {
                     K_EXTRACT_GROUP_INDEX: 0,
-                    K_VALUE_TYPE: K_FLOAT,
+                    K_FORMAT_TYPE: K_FLOAT,
                     K_MATCH: f"^{P_MONEY}$"
                 },
                 K_DISCOUNT: {
                     K_EXTRACT_GROUP_INDEX: 2,
-                    K_VALUE_TYPE: K_FLOAT,
+                    K_FORMAT_TYPE: K_FLOAT,
                     K_MATCH: "(Line Discount:)\\s*(\\d+)"
                 }
             }
