@@ -10,19 +10,20 @@ T_TOTAL_QUANTITY = "_total_quantity"
 T_TOTAL_AMOUNT = "_total_amount"
 K_ABS_DISCOUNT = "abs_discount"
 
-def format_value(format_type, value):
-    # Define the float conversion function
-    def float_cast(value):
-        if isinstance(value, str):
-            value = value.replace(',', '')
-        value = float(value)
-        return f"{value:.2f}"
+# Define the float conversion function
+def float_cast(value):
+    if isinstance(value, str):
+        value = value.replace(',', '')
+    value = float(value)
+    return f"{value:.2f}"
 
-    FORMAT_TYPES = {
-        config.K_STR: lambda value: str(value),
-        config.K_INT: lambda value: int(value),
-        config.K_FLOAT: float_cast
-    }
+FORMAT_TYPES = {
+    config.K_STR: lambda value: str(value),
+    config.K_INT: lambda value: int(value),
+    config.K_FLOAT: float_cast
+}
+
+def format_value(format_type, value):
     if not format_type in FORMAT_TYPES:
         return value
     return FORMAT_TYPES[format_type](value)
