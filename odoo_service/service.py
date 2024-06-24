@@ -36,5 +36,5 @@ def is_receipt_doc_type(text):
     return False
 
 if __name__ == "__main__":
-    txt = pdf_to_text("C:\MRA\/another.pdf")
+    txt = pdf_to_text("Odoo POS_With Discount (1).pdf")
     print(receipt.parse(txt))

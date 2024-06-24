@@ -9,9 +9,9 @@ def float_cast(value):
     return f"{value:.2f}"
 
 TYPE_CASTS = {
-   K_STR: lambda value: str(value),
-   K_INT: lambda value: int(value),
-   K_FLOAT: float_cast
+   config.K_STR: lambda value: str(value),
+   config.K_INT: lambda value: int(value),
+   config.K_FLOAT: float_cast
 }
 
 def extract(globals, patterns, text_line):
@@ -33,10 +33,7 @@ def extract(globals, patterns, text_line):
         value = matches.group(p_config[config.K_EXTRACT_GROUP_INDEX])
         # Format values if dictionary defines such
         if config.K_VALUE_TYPE in p_config:
-            # Intentional quirk
-            if p_config[config.K_VALUE_TYPE] == config.K_STR and i in data and data[i]:
-                data[i] += f" {value}"
-            data[i] = TYPE_CASTS[p_config[config.K_VALUE_TYPE]](data[i])
+            data[i] = TYPE_CASTS[p_config[config.K_VALUE_TYPE]](value)
             continue
         data[i] = value
     return data
@@ -61,13 +58,14 @@ def extract_product(globals, patterns, text_line):
 
     if re.match(rf"{patterns[config.K_PRODUCT_TERMINATION]}", text_line):
         if data["staged_product"]:
+            has_product_code = config.K_PRODUCT_CODE in data["staged_product"]
             has_product_name = config.K_PRODUCT_NAME in data["staged_product"]
             has_price = config.K_PRICE in data["staged_product"]
             has_quantity = config.K_QUANTITY in data["staged_product"]
 
-            if has_product_name and has_price and has_quantity:
+            if has_product_code and has_product_name and has_price and has_quantity:
                 data["items"].append(data["staged_product"])
-                data["staged_product"] = {}
+        data["staged_product"] = {}
     return data
 
 def parse(text):

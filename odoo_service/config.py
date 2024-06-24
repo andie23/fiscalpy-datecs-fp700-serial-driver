@@ -75,7 +75,7 @@ DEFAULT_CONFIG = {
             },
             K_TOTAL_PRODUCTS: {
                 K_EXTRACT_GROUP_INDEX: 2,
-                K_VALUE_TYPE: K_INT
+                K_VALUE_TYPE: K_INT,
                 K_MATCH: "^(Total No. of Products)\\s*(\\d*)"
             },
             K_CASH_CODE: {
@@ -98,7 +98,7 @@ DEFAULT_CONFIG = {
                 K_MATCH: "^(Order)\\s*(\\d{5}-\\d{3}-\\d{4})"
             },
             K_DATE: {
-                K_EXTRACT_GROUP_INDEX: 1
+                K_EXTRACT_GROUP_INDEX: 1,
                 K_MATCH: f"^{P_DATE}$"
             }
         },
@@ -113,7 +113,7 @@ DEFAULT_CONFIG = {
                 },
                 K_PRODUCT_NAME: {
                     K_VALUE_TYPE: K_STR,
-                    K_EXTRACT_GROUP_INDEX: 0
+                    K_EXTRACT_GROUP_INDEX: 0,
                     K_EXCLUDE_PATTERN: f"{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|Line Discount|{P_URL}",
                     K_MATCH: "\\w*"
                 },
