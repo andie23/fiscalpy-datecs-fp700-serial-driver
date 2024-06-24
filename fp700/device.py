@@ -40,11 +40,12 @@ class DeviceService:
             for command in commands:
                 self.serial.write(command)
                 self.wait()
+            self.close()
             return True
         except Exception as error:
             log.error(error)
-        self.close()
-        return False
+            self.close()
+            return False
     
     def get_active_ports(self):
         return [s.device for s in list(serial.tools.list_ports.comports())]
@@ -104,6 +105,3 @@ class DeviceService:
             if len(b_buffer) >= max_size or elapsed_time > timeout:
                 break
         return b_buffer
-
-    
-
