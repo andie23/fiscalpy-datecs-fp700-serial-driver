@@ -4,6 +4,11 @@ import config
 K_PRODUCT_START = "start"
 K_PRODUCT_END = "end"
 K_PRODUCT_STAGE = "product_stage"
+T_PRICE = "_price"
+T_TOTAL_PRODUCTS = "_total_products"
+T_TOTAL_QUANTITY = "_total_quantity"
+T_TOTAL_AMOUNT = "_total_amount"
+K_ABS_DISCOUNT = "abs_discount"
 
 def format_value(format_type, value):
     # Define the float conversion function
@@ -52,8 +57,10 @@ def extract_product(globals, patterns, text_line):
         if re.match(rf"{patterns[config.K_PRODUCT_START]}", text_line):
             data[K_PRODUCT_START] = True
             data[K_PRODUCT_END] = False
-            if config.K_PRODUCTS not in data:
-                data[config.K_PRODUCTS] = []
+            data[T_TOTAL_PRODUCTS] = 0
+            data[T_TOTAL_QUANTITY] = 0
+            data[T_TOTAL_AMOUNT] = 0
+            data[config.K_PRODUCTS] = []
         return data
 
     if re.match(rf"{patterns[config.K_PRODUCT_END]}", text_line):
@@ -61,9 +68,7 @@ def extract_product(globals, patterns, text_line):
         return data
 
     data[K_PRODUCT_STAGE] = extract_and_format_data(
-        data[K_PRODUCT_STAGE],
-        patterns[config.K_PRODUCT],
-        text_line
+        data[K_PRODUCT_STAGE], patterns[config.K_PRODUCT], text_line
     )
     
     if re.match(rf"{patterns[config.K_PRODUCT_TERMINATION]}", text_line):
@@ -74,7 +79,17 @@ def extract_product(globals, patterns, text_line):
             has_quantity = config.K_QUANTITY in data[K_PRODUCT_STAGE]
             
             if has_product_code and has_product_name and has_price and has_quantity:
-                data[config.K_PRODUCTS].append(data[K_PRODUCT_STAGE])
+                product = {**data[K_PRODUCT_STAGE]}
+                # backup price
+                product[T_PRICE] = product[config.K_PRICE]
+                if config.K_DISCOUNT in product:
+                    product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
+                    product[K_ABS_DISCOUNT] = float(product[T_PRICE]) - float(product[config.K_PRICE])
+                # Update realtime calculations
+                data[T_TOTAL_PRODUCTS] += 1
+                data[T_TOTAL_QUANTITY] += product[config.K_QUANTITY]
+                data[T_TOTAL_AMOUNT] += product[config.K_QUANTITY] * float(product[T_PRICE])
+                data[config.K_PRODUCTS].append(product)
         data[K_PRODUCT_STAGE] = {}
     return data
 
@@ -105,4 +120,11 @@ def parse(text):
                 conf[config.K_PRODUCTS], 
                 line
             )
-    return globals
+    return {
+        "is_valid": all([
+            globals[config.K_TOTAL_QUANTITY] == globals[T_TOTAL_QUANTITY],
+            globals[config.K_TOTAL_PRODUCTS] == globals[T_TOTAL_PRODUCTS],
+            str(globals[config.K_TOTAL_AMOUNT]) == str(globals[T_TOTAL_AMOUNT])
+        ]),
+        **globals
+    }

@@ -10,7 +10,7 @@ P_DATE = "(\\d{4}-\\d{2}-\\d{2}) (\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2})"
 P_QUANTITY_AND_PRICE = f"(\\d*)\\s*x\\s*({P_MONEY})" 
 P_URL = "\\b((?:[a-zA-Z][a-zA-Z0-9+.-]*):\/\/[^\s/$.?#].[^\s]*)\\b"
 P_PRODUCT_CODE = "\\[\\w*\\]"
-
+K_TOTAL_AMOUNT = "total_amount"
 K_PRODUCT_TERMINATION = 'product_termination'
 K_PRODUCT_START = 'begin_after'
 K_PRODUCT_END = 'stop_when'
@@ -50,11 +50,7 @@ K_INT = "NUMBER"
 K_FLOAT = "FLOAT"
 K_PAYMENT_MODES = "payment_modes"
 K_PRODUCTS = "products"
-PAYMENT_CODES = [
-    K_CASH_CODE, 
-    K_CREDIT_CODE, 
-    K_CHEQUE_CODE 
-]
+K_TOTAL = "TOTAL"
 
 DEFAULT_CONFIG = {
     K_DOWNLOAD_FOLDER: "Downloads",
@@ -68,6 +64,15 @@ DEFAULT_CONFIG = {
             K_USER: {
                 K_EXTRACT_GROUP_INDEX: 2,
                 K_MATCH: "^(Served by)\\s*(\\w*)"
+            },
+            K_TOTAL: {
+                K_EXTRACT_GROUP_INDEX: 0,
+                K_MATCH: "^TOTAL$"  
+            },
+            K_TOTAL_AMOUNT: {
+                K_EXTRACT_GROUP_INDEX: 1,
+                K_FORMAT_TYPE: K_FLOAT,
+                K_MATCH: f"^({P_MONEY}) MWK$"
             },
             K_TOTAL_QUANTITY: {
                 K_EXTRACT_GROUP_INDEX: 2,
