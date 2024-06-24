@@ -31,7 +31,7 @@ def run_commands_from_file(file_location):
 def print_fiscal_receipt_from_json(file_location):
     with open(file_location, "r") as f:
         receipt_data = json.load(f)
-        if config.get_config("Tpin Lock") and config.get_config('Tpin') != receipt_data["tpin"]:
+        if config.get_config(config.K_TPIN_LOCK) and config.get_config(config.K_TPIN) != receipt_data["tpin"]:
             beep_printer(5)
             return log.error(f"TPIN {receipt_data['tpin']} is not configured")
         try:
@@ -51,9 +51,9 @@ def print_fiscal_receipt(receipt_data):
 def print_production_fiscal_receipt(receipt_data):
     receipt_commands = [
         cmd.b_open_fiscal_receipt(
-            code=config.get_config("Operator Code"),
-            password=config.get_config("Operator Password"),
-            till=config.get_config("Till Number"),
+            code=config.get_config(config.K_OPERATOR_CODE),
+            password=config.get_config(config.K_OPERATOR_PASSWORD),
+            till=config.get_config(config.K_TILL),
             buyer=receipt_data["buyer"] or "",
             buyer_tin=receipt_data["buyer_tin"] or ""
         ),
@@ -67,7 +67,7 @@ def print_production_fiscal_receipt(receipt_data):
     for product in receipt_data["sales_item"]:
         discount = None
         use_perc_discount = True
-        product_name = f"{product['name'].strip()[:config.get_config('Item Name Length')]}"
+        product_name = f"{product['name'].strip()[:config.get_config(config.K_PROD_NAME_LENGTH)]}"
 
         if "abs_discount" in product:
             discount = product["abs_discount"]
@@ -94,7 +94,7 @@ def print_production_fiscal_receipt(receipt_data):
 
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
-    print_copy = config.get_config("Print Copies")
+    print_copy = config.get_config(config.K_PRINT_COPIES)
 
     if "print_copy" in receipt_data:
         print_copy = receipt_data["print_copy"]
@@ -107,9 +107,9 @@ def print_production_fiscal_receipt(receipt_data):
 def print_non_production_fiscal_receipt(receipt_data):
     receipt_commands = [
         cmd.b_open_fiscal_receipt(
-            code=config.get_config("Operator Code"),
-            password=config.get_config("Operator Password"),
-            till=config.get_config("Till Number"),
+            code=config.get_config(config.K_OPERATOR_CODE),
+            password=config.get_config(config.K_OPERATOR_PASSWORD),
+            till=config.get_config(config.K_TILL),
             buyer=receipt_data["buyer"] or "",
             buyer_tin=receipt_data["buyer_tin"] or ""
         ),
@@ -129,7 +129,7 @@ def print_non_production_fiscal_receipt(receipt_data):
     for product in receipt_data["sales_item"]:
         discount = None
         use_perc_discount = True
-        product_name = f"{product['name'].strip()[:config.get_config('Item Name Length')]}"
+        product_name = f"{product['name'].strip()[:config.get_config(config.K_PROD_NAME_LENGTH)]}"
 
         if "abs_discount" in product:
             discount = product["abs_discount"]
@@ -160,7 +160,7 @@ def print_non_production_fiscal_receipt(receipt_data):
     receipt_commands.append(cmd.b_write_free_fiscal_text(f"andiemfune@gmail.com"))
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
-    print_copy = config.get_config("Print Copies")
+    print_copy = config.get_config(config.K_PRINT_COPIES)
 
     if "print_copy" in receipt_data:
         print_copy = receipt_data["print_copy"]

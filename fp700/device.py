@@ -10,9 +10,9 @@ class DeviceService:
         self.serial = Serial()
 
     def wait(self):
-        time.sleep(config.get_config("Command Delay"))
+        time.sleep(config.get_config(config.K_COMMAND_DELAY))
 
-    def open(self, port=config.get_config("Port"), baudrate=config.get_config("Baudrate")):
+    def open(self, port=config.get_config(config.K_PORT), baudrate=config.get_config(config.K_BAUDRATE)):
         log.info(f"Connecting {port}")
         if not self.serial.is_open:
             self.serial.port = port
@@ -50,7 +50,7 @@ class DeviceService:
     def get_active_ports(self):
         return [s.device for s in list(serial.tools.list_ports.comports())]
     
-    def get_device_info(self, port=config.get_config("Port")):
+    def get_device_info(self, port=config.get_config(config.K_PORT)):
         if not self.open(port):
             return None
         try:

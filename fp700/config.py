@@ -2,17 +2,29 @@ import os
 import json
 
 CONFIG_FILE = 'fp700.config.json'
+
+K_PORT = "Port"
+K_BAUDRATE = "Baudrate"
+K_TILL = "Till Number"
+K_OPERATOR_CODE = "Operator Code"
+K_OPERATOR_PASSWORD = "Operator Password"
+K_PRINT_COPIES = "Print Copies"
+K_PROD_NAME_LENGTH = "Item Name Length"
+K_COMMAND_DELAY = "Command Delay"
+K_TPIN = "Tpin"
+K_TPIN_LOCK = "Tpin Lock"
+
 DEFAULT_CONFIG = {
-    "Port": "COM1",
-    "Baudrate": 115200,
-    "Till Number": 1,
-    "Operator Code": 2,
-    "Operator Password": "0000",
-    "Print Copies": False,
-    "Item Name Length": 24, 
-    "Command Delay": 0.05,
-    "Tpin": "00000",
-    "Tpin Lock": False
+    K_PORT: "COM1",
+    K_BAUDRATE: 115200,
+    K_TILL: 1,
+    K_OPERATOR_CODE: 2,
+    K_OPERATOR_PASSWORD: "0000",
+    K_PRINT_COPIES: False,
+    K_PROD_NAME_LENGTH: 24, 
+    K_COMMAND_DELAY: 0.05,
+    K_TPIN: "00000",
+    K_TPIN_LOCK: False
 }
 
 def reset():
