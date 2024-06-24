@@ -84,6 +84,7 @@ def extract_product(globals, patterns, text_line):
                 product[T_PRICE] = product[config.K_PRICE]
                 if config.K_DISCOUNT in product:
                     product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
+                    product[config.K_DISCOUNT] = -product[config.K_DISCOUNT]
                     product[K_ABS_DISCOUNT] = float(product[T_PRICE]) - float(product[config.K_PRICE])
                 # Update realtime calculations
                 data[T_TOTAL_PRODUCTS] += 1
