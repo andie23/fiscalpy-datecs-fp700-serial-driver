@@ -73,27 +73,32 @@ def extract_product(globals, patterns, text_line):
     )
     
     if re.match(rf"{patterns[config.K_PRODUCT_TERMINATION]}", text_line):
-        if data[K_PRODUCT_STAGE]:
-            product_attribute_checks = [
-                config.K_PRODUCT_CODE in data[K_PRODUCT_STAGE],
-                config.K_PRODUCT_NAME in data[K_PRODUCT_STAGE],
-                config.K_PRICE in data[K_PRODUCT_STAGE],
-                config.K_QUANTITY in data[K_PRODUCT_STAGE]
-            ]
-            if all(product_attribute_checks):
-                product = {**data[K_PRODUCT_STAGE]}
-                # backup price
-                product[T_PRICE] = product[config.K_PRICE]
-                if config.K_DISCOUNT in product:
-                    product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
-                    product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
-                    product[K_ABS_DISCOUNT] = float(product[T_PRICE]) - float(product[config.K_PRICE])
-                # Update realtime calculations
-                data[T_TOTAL_PRODUCTS] += 1
-                data[T_TOTAL_QUANTITY] += product[config.K_QUANTITY]
-                data[T_TOTAL_AMOUNT] += product[config.K_QUANTITY] * float(product[T_PRICE])
-                data[config.K_PRODUCTS].append(product)
+        if not data[K_PRODUCT_STAGE]:
+            return data
+
+        product_attribute_checks = [
+            config.K_PRODUCT_CODE in data[K_PRODUCT_STAGE],
+            config.K_PRODUCT_NAME in data[K_PRODUCT_STAGE],
+            config.K_PRICE in data[K_PRODUCT_STAGE],
+            config.K_QUANTITY in data[K_PRODUCT_STAGE]
+        ]
+        product = {**data[K_PRODUCT_STAGE]}
         data[K_PRODUCT_STAGE] = {}
+
+        if not all(product_attribute_checks):
+            return data
+
+        # backup price
+        product[T_PRICE] = product[config.K_PRICE]
+        if config.K_DISCOUNT in product:
+            product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
+            product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
+            product[K_ABS_DISCOUNT] = float(product[T_PRICE]) - float(product[config.K_PRICE])
+        # Update realtime calculations
+        data[T_TOTAL_PRODUCTS] += 1
+        data[T_TOTAL_QUANTITY] += product[config.K_QUANTITY]
+        data[T_TOTAL_AMOUNT] += product[config.K_QUANTITY] * float(product[T_PRICE])
+        data[config.K_PRODUCTS].append(product)
     return data
 
 def parse(text):

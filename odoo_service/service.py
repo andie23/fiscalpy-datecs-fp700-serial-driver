@@ -19,7 +19,7 @@ class ReceiptHandler(FileSystemEventHandler):
                     if not data["is_valid"]:
                         log.error("Invalid receipt")
                     else:
-                        log.info()
+                        log.info(data)
             except Exception as error:
                 log.error(error)
 
