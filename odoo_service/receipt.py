@@ -74,18 +74,19 @@ def extract_product(globals, patterns, text_line):
     
     if re.match(rf"{patterns[config.K_PRODUCT_TERMINATION]}", text_line):
         if data[K_PRODUCT_STAGE]:
-            has_product_code = config.K_PRODUCT_CODE in data[K_PRODUCT_STAGE]
-            has_product_name = config.K_PRODUCT_NAME in data[K_PRODUCT_STAGE]
-            has_price = config.K_PRICE in data[K_PRODUCT_STAGE]
-            has_quantity = config.K_QUANTITY in data[K_PRODUCT_STAGE]
-            
-            if has_product_code and has_product_name and has_price and has_quantity:
+            product_attribute_checks = [
+                config.K_PRODUCT_CODE in data[K_PRODUCT_STAGE],
+                config.K_PRODUCT_NAME in data[K_PRODUCT_STAGE],
+                config.K_PRICE in data[K_PRODUCT_STAGE],
+                config.K_QUANTITY in data[K_PRODUCT_STAGE]
+            ]
+            if all(product_attribute_checks):
                 product = {**data[K_PRODUCT_STAGE]}
                 # backup price
                 product[T_PRICE] = product[config.K_PRICE]
                 if config.K_DISCOUNT in product:
                     product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
-                    product[config.K_DISCOUNT] = -product[config.K_DISCOUNT]
+                    product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
                     product[K_ABS_DISCOUNT] = float(product[T_PRICE]) - float(product[config.K_PRICE])
                 # Update realtime calculations
                 data[T_TOTAL_PRODUCTS] += 1
