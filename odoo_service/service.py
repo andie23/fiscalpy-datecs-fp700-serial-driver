@@ -23,33 +23,17 @@ def get_line_index_score(indexes, text_line):
             return indexes[index]
     return 0
 
-def detect_doc_type(text):
+def is_receipt_doc_type(text):
     indexes = config.get_config(config.K_DOC_IDENTIFICATION_INDEX)
     receipt_score = 0
-    invoice_score = 0
-    org_score = 0
 
     for line in text.split('\n'):
-        org_score += get_line_index_score(
-            indexes[config.K_ORG], line
-        )
         receipt_score += get_line_index_score(
             indexes[config.K_RECEIPT], line
         )
-        invoice_score += get_line_index_score(
-            indexes[config.K_INVOICE], line
-        )
-
-    if org_score < len(indexes[config.K_ORG]):
-        return None
-
-    if receipt_score > invoice_score:
-        return config.K_RECEIPT
-    
-    if invoice_score > receipt_score:
-        return config.K_INVOICE
-
-    return None
+        if receipt_score >= config.MIN_DOC_IDENTIFICATION_SCORE:
+            return True
+    return False
 
 if __name__ == "__main__":
     txt = pdf_to_text("C:\MRA\/another.pdf")

@@ -1,34 +1,49 @@
 import re
 import config
 
-PAYMENT_CODES = [
-    config.K_CASH_CODE, 
-    config.K_CREDIT_CODE, 
-    config.K_CHEQUE_CODE 
-]
+# Define the float conversion function
+def float_cast(value):
+    if isinstance(value, str):
+        value = value.replace(',', '')
+    value = float(value)
+    return f"{value:.2f}"
 
-def extract_features(globals, patterns, text_line):
+TYPE_CASTS = {
+   K_STR: lambda value: str(value),
+   K_INT: lambda value: int(value),
+   K_FLOAT: float_cast
+}
+
+def extract(globals, patterns, text_line):
     data = {**globals}
-    for i in patterns:
-        pattern = re.compile(rf"{patterns[i][0]}", re.IGNORECASE)
-        matches = pattern.search(text_line)
+    for i, p_config in patterns.items():
+        # Skip text_lines that match black listed patterns
+        if config.K_EXCLUDE_PATTERN in p_config:
+            blacklist_pattern = re.compile(rf"{p_config[config.K_EXCLUDE_PATTERN]}", re.IGNORECASE)
+            if blacklist_pattern.search(text_line):
+                continue
+
+        # Match whitelist
+        white_pattern = re.compile(rf"{p_config[config.K_MATCH]}", re.IGNORECASE)
+        matches = white_pattern.search(text_line)
+
         if not matches:
             continue
-        group = patterns[i][1] if len(patterns[i]) >= 2 else 2
-        if i in PAYMENT_CODES:
-            data["payment_modes"].append({ i : matches.group(group) })
-            return data
-        else:
-            if i not in data or not data[i]:
-                data[i] = matches.group(group)
-                # Check if we have flags to continue with the loop
-                if len(patterns[i]) >= 3 and patterns[i]:
-                    continue
-                return data
+
+        value = matches.group(p_config[config.K_EXTRACT_GROUP_INDEX])
+        # Format values if dictionary defines such
+        if config.K_VALUE_TYPE in p_config:
+            # Intentional quirk
+            if p_config[config.K_VALUE_TYPE] == config.K_STR and i in data and data[i]:
+                data[i] += f" {value}"
+            data[i] = TYPE_CASTS[p_config[config.K_VALUE_TYPE]](data[i])
+            continue
+        data[i] = value
     return data
 
-def extract_product_features(globals, patterns, text_line):
+def extract_product(globals, patterns, text_line):
     data = {**globals}
+
     if not data["is_parsing_products"]:
         is_start_pattern = re.match(rf"{patterns[config.K_PRODUCT_START]}", text_line)
         data["is_parsing_products"] = True if is_start_pattern else False
@@ -38,7 +53,7 @@ def extract_product_features(globals, patterns, text_line):
         data["is_parsing_products"] = False
         return data
     
-    data["staged_product"] = extract_features(
+    data["staged_product"] = extract(
         data["staged_product"],
         patterns[config.K_PRODUCT],
         text_line
@@ -46,8 +61,13 @@ def extract_product_features(globals, patterns, text_line):
 
     if re.match(rf"{patterns[config.K_PRODUCT_TERMINATION]}", text_line):
         if data["staged_product"]:
-            data["items"].append(data["staged_product"])
-            data["staged_product"] = {}
+            has_product_name = config.K_PRODUCT_NAME in data["staged_product"]
+            has_price = config.K_PRICE in data["staged_product"]
+            has_quantity = config.K_QUANTITY in data["staged_product"]
+
+            if has_product_name and has_price and has_quantity:
+                data["items"].append(data["staged_product"])
+                data["staged_product"] = {}
     return data
 
 def parse(text):
@@ -67,7 +87,7 @@ def parse(text):
 
     for line in text.split("\n"):
         if not globals["is_parsing_products"]:
-            globals = extract_features(globals, conf[config.K_META], line)
-        globals = extract_product_features(globals, conf[config.K_PRODUCT], line)
+            globals = extract(globals, conf[config.K_META], line)
+        globals = extract_product(globals, conf[config.K_PRODUCT], line)
 
     return globals
