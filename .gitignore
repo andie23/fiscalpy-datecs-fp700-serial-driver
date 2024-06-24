@@ -5,5 +5,5 @@ fp700/dist/*
 odoo_service/build/*
 fp700/build/*
 odoo_service/build/*
-main.spec
+fp700.spec
 __pycache__
