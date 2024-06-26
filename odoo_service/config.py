@@ -51,6 +51,7 @@ K_FLOAT = "FLOAT"
 K_PAYMENT_MODES = "payment_modes"
 K_PRODUCTS = "products"
 K_TOTAL = "TOTAL"
+K_TAX_CODE = "tax_code"
 
 DEFAULT_CONFIG = {
     K_DOWNLOAD_FOLDER: "Downloads",
@@ -123,6 +124,10 @@ DEFAULT_CONFIG = {
                     K_EXTRACT_GROUP_INDEX: 0,
                     K_EXCLUDE_PATTERN: f"{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|Line Discount|{P_URL}",
                     K_MATCH: ".*"
+                },
+                K_TAX_CODE: {
+                    K_EXTRACT_GROUP_INDEX: 0,
+                    K_MATCH: "^A|B|E|a|b|e$" # placeholder extraction of tax code
                 },
                 K_QUANTITY: {
                     K_EXTRACT_GROUP_INDEX: 1,
