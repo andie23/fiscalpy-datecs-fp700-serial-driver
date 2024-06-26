@@ -20,6 +20,7 @@ def float_cast(value):
 FORMAT_TYPES = {
     config.K_STR: lambda value: str(value),
     config.K_INT: lambda value: int(value),
+    config.K_STR_UP_CASE: lambda value: f"{value}".upper(),
     config.K_FLOAT: float_cast
 }
 

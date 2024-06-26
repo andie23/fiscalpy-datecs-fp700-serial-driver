@@ -16,7 +16,7 @@ K_PRODUCT_START = 'begin_after'
 K_PRODUCT_END = 'stop_when'
 K_PRODUCT = 'product'
 K_PRODUCT_CODE = 'product_code'
-K_PRODUCT_NAME = 'product_name'
+K_PRODUCT_NAME = 'name'
 K_PRICE_AND_QUANTITY = "price_and_quantity"
 K_USER = 'user'
 K_TPIN = 'tpin'
@@ -28,7 +28,7 @@ K_CASH_CODE = 'P'
 K_CREDIT_CODE = 'N'
 K_CHEQUE_CODE = 'C'
 K_TOTAL_BEFORE_DISCOUNT = "total_before_discount"
-K_DISCOUNT = 'discount'
+K_DISCOUNT = 'perc_discount'
 K_META = 'meta'
 K_DOC_IDENTIFICATION_INDEX = "doc_identification_index"
 K_RECEIPT = 'receipt'
@@ -46,6 +46,7 @@ K_EXCLUDE_PATTERN = "pattern_blacklist"
 K_BREAK_ITERATION = "break_iteration"
 K_FORMAT_TYPE = "type"
 K_STR = "LETTERS"
+K_STR_UP_CASE = "UPPER_CASE_LETTERS"
 K_INT = "NUMBER"
 K_FLOAT = "FLOAT"
 K_PAYMENT_MODES = "payment_modes"
@@ -127,6 +128,7 @@ DEFAULT_CONFIG = {
                 },
                 K_TAX_CODE: {
                     K_EXTRACT_GROUP_INDEX: 0,
+                    K_FORMAT_TYPE: K_STR_UP_CASE,
                     K_MATCH: "^A|B|E|a|b|e$" # placeholder extraction of tax code
                 },
                 K_QUANTITY: {
