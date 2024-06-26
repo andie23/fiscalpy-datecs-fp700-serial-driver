@@ -20,7 +20,6 @@ class ReceiptHandler(FileSystemEventHandler):
 
         try:
             txt = pdf_to_text(event.src_path)
-
             if not receipt.is_receipt_doc_type(txt):
                 return
 
@@ -34,7 +33,7 @@ class ReceiptHandler(FileSystemEventHandler):
 
             if config.get_config(config.K_VALIDATE_DATE) and not is_today(data["date"]):
                 return log.error(f"Receipt date of {data['date']} does not match today's date")
-
+            # TODO: run print command here
             log.info(data)
             update_received_receipt(data["order_number"], event.src_path)
         except Exception as error:
