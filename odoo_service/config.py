@@ -7,7 +7,7 @@ MIN_DOC_IDENTIFICATION_SCORE = 40
 
 P_ODOO_WATER_MARK = "Odoo POS\s+\d{2}/\d{2}/\d{2},\s+\d{2}:\d{2}\s*(AM|PM)"
 P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{1,2}"
-P_DATE = "(\\d{4}-\\d{2}-\\d{2}) (\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2})"
+P_DATE = "(\\d{4}-\\d{2}-\\d{2}|\\d{2}/\\d{2}/\\d{4}) (\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}|\\d{2}:\\d{2}:\\d{2})"
 P_QUANTITY_AND_PRICE = f"(\\d*)\\s*x\\s*({P_MONEY})" 
 P_URL = "\\b((?:[a-zA-Z][a-zA-Z0-9+.-]*):\/\/[^\s/$.?#].[^\s]*)\\b"
 P_PRODUCT_CODE = "\\[\\w*\\]"
@@ -49,6 +49,7 @@ K_FORMAT_TYPE = "type"
 K_STR = "LETTERS"
 K_STR_UP_CASE = "UPPER_CASE_LETTERS"
 K_INT = "NUMBER"
+K_DATE = "DATE"
 K_FLOAT = "FLOAT"
 K_PAYMENT_MODES = "payment_modes"
 K_PRODUCTS = "products"
@@ -97,6 +98,7 @@ DEFAULT_CONFIG = {
                 K_MATCH: "^(Order)\\s*(\\d{5}-\\d{3}-\\d{4})"
             },
             K_DATE: {
+                K_FORMAT_TYPE: K_DATE,
                 K_EXTRACT_GROUP_INDEX: 1,
                 K_MATCH: f"^{P_DATE}$"
             }

@@ -18,10 +18,17 @@ def float_cast(value):
     value = float(value)
     return f"{value:.2f}"
 
+def date_cast(value):
+    alt_format = re.match("(\\d{2})/(\\d{2})/(\\d{4})", value)
+    if alt_format:
+        return f"{alt_format.group(3)}-{alt_format.group(2)}-{alt_format.group(1)}"
+    return value
+
 FORMAT_TYPES = {
     config.K_STR: lambda value: str(value),
     config.K_INT: lambda value: int(value),
     config.K_STR_UP_CASE: lambda value: f"{value}".upper(),
+    config.K_DATE: date_cast,
     config.K_FLOAT: float_cast
 }
 
