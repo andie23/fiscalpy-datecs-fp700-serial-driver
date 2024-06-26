@@ -1,4 +1,5 @@
 import re
+import log
 import config
 
 K_PRODUCT_START = "start"
@@ -28,6 +29,28 @@ def format_value(format_type, value):
     if not format_type in FORMAT_TYPES:
         return value
     return FORMAT_TYPES[format_type](value)
+
+def get_line_index_score(indexes, text_line):
+    for index in indexes:
+        pattern = re.compile(re.escape(index), re.IGNORECASE)
+        if pattern.search(text_line):
+            return indexes[index]
+    return 0
+
+def is_receipt_doc_type(text):
+    log.info("Determine doc type")
+    indexes = config.get_config(config.K_DOC_IDENTIFICATION_INDEX)
+    receipt_score = 0
+
+    for line in text.split('\n'):
+        receipt_score += get_line_index_score(
+            indexes[config.K_RECEIPT], line
+        )
+        log.info(f"Line:: {line}, Score:: {receipt_score}")
+        if receipt_score >= config.MIN_DOC_IDENTIFICATION_SCORE:
+            log.info(f"Receipt file deteced!")
+            return True
+    return False
 
 def extract_and_format_data(globals, patterns, text_line):
     data = {**globals}

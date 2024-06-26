@@ -5,23 +5,40 @@ import pdfplumber
 import config
 import receipt
 import log
+import shutil
+from datetime import datetime
+from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 class ReceiptHandler(FileSystemEventHandler):
     def on_modified(self, event):
         pattern = re.compile(r".pdf$", re.IGNORECASE)
-        if re.findall(pattern, str(event.src_path)):
-            try:
-                txt = pdf_to_text(event.src_path)
-                if is_receipt_doc_type(txt):
-                    data = receipt.parse(txt)
-                    if not data["is_valid"]:
-                        log.error("Invalid receipt")
-                    else:
-                        log.info(data)
-            except Exception as error:
-                log.error(error)
+
+        if not re.findall(pattern, str(event.src_path)):
+            return
+
+        try:
+            txt = pdf_to_text(event.src_path)
+
+            if not receipt.is_receipt_doc_type(txt):
+                return
+
+            data = receipt.parse(txt)
+
+            if not data["is_valid"]:
+                return log.error("Can't please an invalid receipt")
+
+            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and receipt_already_received(data["order_number"]):
+                return log.error(f"Order {data['order_number']} was already processed")
+
+            if config.get_config(config.K_VALIDATE_DATE) and not is_today(data["date"]):
+                return log.error(f"Receipt date of {data['date']} does not match today's date")
+
+            log.info(data)
+            update_received_receipt(data["order_number"], event.src_path)
+        except Exception as error:
+            log.error(error)
 
 def pdf_to_text(pdf_path):
     text = ""
@@ -36,27 +53,33 @@ def pdf_to_text(pdf_path):
             text += page_text + "\n"
     return text
 
-def get_line_index_score(indexes, text_line):
-    for index in indexes:
-        pattern = re.compile(re.escape(index), re.IGNORECASE)
-        if pattern.search(text_line):
-            return indexes[index]
-    return 0
 
-def is_receipt_doc_type(text):
-    log.info("Determine doc type")
-    indexes = config.get_config(config.K_DOC_IDENTIFICATION_INDEX)
-    receipt_score = 0
+def is_today(date_str):
+    given_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    current_date = datetime.now().date()
+    return given_date == current_date
 
-    for line in text.split('\n'):
-        receipt_score += get_line_index_score(
-            indexes[config.K_RECEIPT], line
-        )
-        log.info(f"Line:: {line}, Score:: {receipt_score}")
-        if receipt_score >= config.MIN_DOC_IDENTIFICATION_SCORE:
-            log.info(f"Is valid receipt!")
-            return True
-    return False
+def receipt_already_received(order_number):
+    dir = Path(f"{config.RECEIVED_RECEIPTS}")
+    path = Path(dir / f"{order_number}.pdf")
+    return path.is_file()
+
+def update_received_receipt(order_id, original_receipt_path):
+    try:
+        directory = Path(config.RECEIVED_RECEIPTS)
+
+        # Ensure the destination directory exists
+        if not directory.exists():
+            directory.mkdir(parents=True, exist_ok=True)
+
+        # Define the destination path
+        destination_path = directory / f"{order_id}.pdf"
+
+        # Move the file
+        shutil.move(original_receipt_path, destination_path)
+        log.info(f"Saved PDF as {destination_path}")
+    except Exception as e:
+        log.info(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     log.info("Starting PDF tracker")

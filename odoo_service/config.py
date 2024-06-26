@@ -2,7 +2,7 @@ import os
 import json
 
 CONFIG_FILE = "odoo.config.json"
-
+RECEIVED_RECEIPTS = "Received Receipts"
 MIN_DOC_IDENTIFICATION_SCORE = 40
 
 P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{1,2}"
@@ -53,10 +53,14 @@ K_PAYMENT_MODES = "payment_modes"
 K_PRODUCTS = "products"
 K_TOTAL = "TOTAL"
 K_TAX_CODE = "tax_code"
+K_VALIDATE_DATE = "validate_receipt_date"
+K_VALIDATE_ORDER_NUMBER = "validate_receipt_order_number"
 
 DEFAULT_CONFIG = {
     K_DOWNLOAD_FOLDER: "Downloads",
     K_MAX_PDF_PAGES: 5,
+    K_VALIDATE_DATE: True,
+    K_VALIDATE_ORDER_NUMBER: True,
     K_RECEIPT: {
         K_META: {
             K_TPIN: {
