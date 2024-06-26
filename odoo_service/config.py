@@ -5,6 +5,7 @@ CONFIG_FILE = "odoo.config.json"
 RECEIVED_RECEIPTS = "Received Receipts"
 MIN_DOC_IDENTIFICATION_SCORE = 40
 
+P_ODOO_WATER_MARK = "Odoo POS\s+\d{2}/\d{2}/\d{2},\s+\d{2}:\d{2}\s*(AM|PM)"
 P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{1,2}"
 P_DATE = "(\\d{4}-\\d{2}-\\d{2}) (\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2})"
 P_QUANTITY_AND_PRICE = f"(\\d*)\\s*x\\s*({P_MONEY})" 
@@ -55,6 +56,7 @@ K_TOTAL = "TOTAL"
 K_TAX_CODE = "tax_code"
 K_VALIDATE_DATE = "validate_receipt_date"
 K_VALIDATE_ORDER_NUMBER = "validate_receipt_order_number"
+K_ALLOW_JOINS = "allow_joins"
 
 DEFAULT_CONFIG = {
     K_DOWNLOAD_FOLDER: "Downloads",
@@ -103,16 +105,19 @@ DEFAULT_CONFIG = {
             K_CASH_CODE: {
                 K_EXTRACT_GROUP_INDEX: 2,
                 K_FORMAT_TYPE: K_FLOAT,
-                K_MATCH: f"^(Cash|Mobile Money)\\s*({P_MONEY})"
+                K_ALLOW_JOINS: True,
+                K_MATCH: f"^(Cash)\\s*({P_MONEY})"
             },
             K_CREDIT_CODE: {
                 K_EXTRACT_GROUP_INDEX: 2,
                 K_FORMAT_TYPE: K_FLOAT,
-                K_MATCH: f"^(Credit Card|Credit/Debit Card|Bank Transfer)\\s*({P_MONEY})"
+                K_ALLOW_JOINS: True,
+                K_MATCH: f"^(Credit Card|Bank)\\s*({P_MONEY})"
             },
             K_CHEQUE_CODE: {
                 K_EXTRACT_GROUP_INDEX: 2,
                 K_FORMAT_TYPE: K_FLOAT,
+                K_ALLOW_JOINS: True,
                 K_MATCH: f"^(Cheque)\\s*({P_MONEY})"
             }
         },
@@ -127,7 +132,16 @@ DEFAULT_CONFIG = {
                 },
                 K_PRODUCT_NAME: {
                     K_EXTRACT_GROUP_INDEX: 0,
-                    K_EXCLUDE_PATTERN: f"{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|Line Discount|{P_URL}",
+                    K_ALLOW_JOINS: True,
+                    K_FORMAT_TYPE: K_STR,
+                    K_EXCLUDE_PATTERN: [
+                        P_ODOO_WATER_MARK,
+                        P_PRODUCT_CODE,
+                        P_QUANTITY_AND_PRICE,
+                        P_MONEY,
+                        "Line Discount",
+                        P_URL
+                    ],
                     K_MATCH: ".*"
                 },
                 K_TAX_CODE: {

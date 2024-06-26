@@ -55,12 +55,13 @@ def is_receipt_doc_type(text):
 def extract_and_format_data(globals, patterns, text_line):
     data = {**globals}
     for prop, meta in patterns.items():
-        #Ignore props which are already defined
-        if prop in data:
+        allow_joins = meta.get(config.K_ALLOW_JOINS, False)
+
+        if prop in data and not allow_joins:
             continue
         # Skip text_lines that match black listed patterns
         if config.K_EXCLUDE_PATTERN in meta:
-            blacklist_pattern = re.compile(rf"{meta[config.K_EXCLUDE_PATTERN]}", re.IGNORECASE)
+            blacklist_pattern = re.compile(rf"{'|'.join(meta[config.K_EXCLUDE_PATTERN])}", re.IGNORECASE)
             if blacklist_pattern.search(text_line):
                 continue
 
@@ -72,7 +73,20 @@ def extract_and_format_data(globals, patterns, text_line):
 
         value = matches.group(meta[config.K_EXTRACT_GROUP_INDEX])
         # Format values if dictionary defines such
-        data[prop] = format_value(meta[config.K_FORMAT_TYPE], value) if config.K_FORMAT_TYPE in meta else value
+        value = format_value(meta.get(config.K_FORMAT_TYPE, config.K_STR), value)
+
+        if prop in data and allow_joins:
+            if config.K_FORMAT_TYPE in meta:
+                if config.K_STR in meta[config.K_FORMAT_TYPE]:
+                    data[prop] += f" {value}"
+                elif config.K_FLOAT in meta[config.K_FORMAT_TYPE]:
+                    data[prop] = float(data[prop]) + float(value)
+                elif config.K_INT in meta[config.K_FORMAT_TYPE]:
+                    data[prop] = int(data[prop]) + int(value)
+            else:
+                data[prop] += value
+        else:
+            data[prop] = value
     return data
 
 def extract_product(globals, patterns, text_line):
@@ -97,18 +111,18 @@ def extract_product(globals, patterns, text_line):
     )
     
     if re.match(rf"{patterns[config.K_PRODUCT_TERMINATION]}", text_line):
-        if not data[K_PRODUCT_STAGE]:
+        product = {**data[K_PRODUCT_STAGE]}
+        if not product:
             return data
 
         product_attribute_checks = [
-            config.K_PRODUCT_CODE in data[K_PRODUCT_STAGE],
-            config.K_PRODUCT_NAME in data[K_PRODUCT_STAGE],
-            config.K_PRICE in data[K_PRODUCT_STAGE],
-            config.K_QUANTITY in data[K_PRODUCT_STAGE]
+            product.get(config.K_PRODUCT_CODE, False),
+            product.get(config.K_PRODUCT_NAME, False),
+            product.get(config.K_PRICE, False),
+            product.get(config.K_QUANTITY, False)
         ]
-        product = {**data[K_PRODUCT_STAGE]}
-        data[K_PRODUCT_STAGE] = {}
 
+        data[K_PRODUCT_STAGE] = {}
         if not all(product_attribute_checks):
             return data
 
