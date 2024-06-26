@@ -43,12 +43,9 @@ fp700.exe -p c "42::Hello world!"
     "buyer": "Test Buyer",
     "buyer_tin": 0000,
     "print_copy": false,
-    "payment_modes": [
-        {
-            "mode": "P",
-            "amount": 1.0
-        }
-    ],
+    "payment_modes": {
+        "P": 1.0
+    },
     "sales_item": [
         {
             "tax_code": "A",

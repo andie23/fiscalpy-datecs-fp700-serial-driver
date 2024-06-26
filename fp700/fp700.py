@@ -87,10 +87,10 @@ def print_production_fiscal_receipt(receipt_data):
             )
         )
 
-    for p in receipt_data["payment_modes"]:
-        if p["mode"] not in cmd.SUPPORTED_PAYMENT_TYPE:
-            raise Exception(f"{p['mode']} is not a valid payment code found in {cmd.SUPPORTED_PAYMENT_TYPE}")
-        receipt_commands.append(cmd.b_calculate_totals(p["mode"], p["amount"]))
+    for p_code, p_amount in receipt_data["payment_modes"].items():
+        if p_code not in cmd.SUPPORTED_PAYMENT_TYPE:
+            raise Exception(f"{p_code} is not a valid payment code found in {cmd.SUPPORTED_PAYMENT_TYPE}")
+        receipt_commands.append(cmd.b_calculate_totals(p_code, p_amount))
 
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
@@ -149,10 +149,10 @@ def print_non_production_fiscal_receipt(receipt_data):
             )
         )
  
-    for p in receipt_data["payment_modes"]:
-        if p["mode"] not in cmd.SUPPORTED_PAYMENT_TYPE:
-            raise Exception(f"{p['mode']} is not a valid payment code found in {cmd.SUPPORTED_PAYMENT_TYPE}")
-        receipt_commands.append(cmd.b_calculate_totals(p["mode"], p["amount"]))
+    for p_code, p_amount in receipt_data["payment_modes"].items():
+        if p_code not in cmd.SUPPORTED_PAYMENT_TYPE:
+            raise Exception(f"{p_code} is not a valid payment code found in {cmd.SUPPORTED_PAYMENT_TYPE}")
+        receipt_commands.append(cmd.b_calculate_totals(p_code, p_amount))
 
     receipt_commands.append(cmd.b_print_seperator_line()),
     receipt_commands.append(cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT FOR TESTING ONLY!!"))
