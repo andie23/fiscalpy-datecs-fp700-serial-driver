@@ -25,9 +25,9 @@ class ReceiptHandler(FileSystemEventHandler):
                 return
 
             data = receipt.parse(txt)
-
+            log.info(data)
             if not data["is_valid"]:
-                return log.error("Can't please an invalid receipt")
+                return log.error("Can't print an invalid receipt")
 
             if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and receipt_already_received(data["order_number"]):
                 return log.error(f"Order {data['order_number']} was already processed")

@@ -156,7 +156,7 @@ def parse(text):
         "is_valid": all([
             globals[config.K_TOTAL_QUANTITY] == globals[T_TOTAL_QUANTITY],
             globals[config.K_TOTAL_PRODUCTS] == globals[T_TOTAL_PRODUCTS],
-            str(globals[config.K_TOTAL_AMOUNT]) == str(globals[T_TOTAL_AMOUNT])
+            float(globals[config.K_TOTAL_AMOUNT]) == float(globals[T_TOTAL_AMOUNT])
         ]),
         **globals
     }
