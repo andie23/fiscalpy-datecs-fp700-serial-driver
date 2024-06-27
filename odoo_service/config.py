@@ -62,12 +62,14 @@ K_TAX_CODE_A = "A"
 K_TAX_CODE_B = "B"
 K_TAX_CODE_E = "E"
 K_VALUE = "value"
+K_PRINTER_SDK = "printer_sdk"
 
 DEFAULT_CONFIG = {
     K_DOWNLOAD_FOLDER: "Downloads",
     K_MAX_PDF_PAGES: 5,
     K_VALIDATE_DATE: True,
     K_VALIDATE_ORDER_NUMBER: True,
+    K_PRINTER_SDK: ".\\fp700.exe",
     K_RECEIPT: {
         K_META: {
             K_TPIN: {

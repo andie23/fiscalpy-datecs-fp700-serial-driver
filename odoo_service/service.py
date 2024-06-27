@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import time
 import pdfplumber
 import config
@@ -24,18 +25,24 @@ class ReceiptHandler(FileSystemEventHandler):
             data = receipt.parse(txt)
             log.info(data)
             if not data["is_valid"]:
+                run_printer_command("-b 2")
                 return log.error("Can't print an invalid receipt")
 
             if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and receipt_already_received(data[config.K_ORDER_NUMBER]):
+                run_printer_command("-b 3")
                 return log.error(f"Order {data[config.K_ORDER_NUMBER]} was already processed")
 
             if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
+                run_printer_command("-b 3")
                 return log.error(f"Receipt date of {data[config.K_DATE]} does not match today's date")
-            # TODO: run print command here
-            log.info(data)
+            run_printer_command(f"-p j {json.dumps(data)}")
             update_received_receipt(data[config.K_ORDER_NUMBER], event.src_path)
         except Exception as error:
             log.error(error)
+
+def run_printer_command(command):
+    sdk_path = config.get_config(config.K_PRINTER_SDK)
+    os.system(f"{sdk_path} {command}")
 
 def pdf_to_text(pdf_path):
     text = ""
