@@ -59,9 +59,25 @@ def is_receipt_doc_type(text):
             return True
     return False
 
+def is_parser_object(obj):
+    spec = [
+        config.K_EXTRACT_GROUP_INDEX, 
+        config.K_FORMAT_TYPE, 
+        config.K_MATCH, 
+        config.K_ALLOW_JOINS, 
+        config.K_EXCLUDE_PATTERN
+    ]
+    return any(key in obj for key in spec)
+
 def extract_and_format_data(globals, patterns, text_line):
     data = {**globals}
     for prop, meta in patterns.items():
+        if not is_parser_object(meta):
+            data[prop] = extract_and_format_data(
+                data.get(prop, {}), meta, text_line
+            )
+            continue
+
         allow_joins = meta.get(config.K_ALLOW_JOINS, False)
 
         if prop in data and not allow_joins:
@@ -159,12 +175,6 @@ def parse(text):
             globals = extract_and_format_data(
                 globals, 
                 conf[config.K_META], 
-                line
-            )
-        if globals[K_PRODUCT_END]:
-            globals[config.K_PAYMENT_MODES] = extract_and_format_data(
-                globals[config.K_PAYMENT_MODES], 
-                conf[config.K_PAYMENT_MODES], 
                 line
             )
         if not globals[K_PRODUCT_END]:

@@ -93,6 +93,26 @@ DEFAULT_CONFIG = {
                 K_FORMAT_TYPE: K_INT,
                 K_MATCH: "^(Total No. of Products)\\s*(\\d*)"
             },
+            K_PAYMENT_MODES: {
+                K_CASH_CODE: {
+                    K_EXTRACT_GROUP_INDEX: 2,
+                    K_FORMAT_TYPE: K_FLOAT,
+                    K_ALLOW_JOINS: True,
+                    K_MATCH: f"^(Cash)\\s*({P_MONEY})"
+                },
+                K_CREDIT_CODE: {
+                    K_EXTRACT_GROUP_INDEX: 2,
+                    K_FORMAT_TYPE: K_FLOAT,
+                    K_ALLOW_JOINS: True,
+                    K_MATCH: f"^(Credit Card|Bank)\\s*({P_MONEY})"
+                },
+                K_CHEQUE_CODE: {
+                    K_EXTRACT_GROUP_INDEX: 2,
+                    K_FORMAT_TYPE: K_FLOAT,
+                    K_ALLOW_JOINS: True,
+                    K_MATCH: f"^(Cheque)\\s*({P_MONEY})"
+                }
+            },
             K_ORDER_NUMBER: {
                 K_EXTRACT_GROUP_INDEX: 2,
                 K_MATCH: "^(Order)\\s*(\\d{5}-\\d{3}-\\d{4})"
@@ -101,26 +121,6 @@ DEFAULT_CONFIG = {
                 K_FORMAT_TYPE: K_DATE,
                 K_EXTRACT_GROUP_INDEX: 1,
                 K_MATCH: f"^{P_DATE}$"
-            }
-        },
-        K_PAYMENT_MODES: {
-            K_CASH_CODE: {
-                K_EXTRACT_GROUP_INDEX: 2,
-                K_FORMAT_TYPE: K_FLOAT,
-                K_ALLOW_JOINS: True,
-                K_MATCH: f"^(Cash)\\s*({P_MONEY})"
-            },
-            K_CREDIT_CODE: {
-                K_EXTRACT_GROUP_INDEX: 2,
-                K_FORMAT_TYPE: K_FLOAT,
-                K_ALLOW_JOINS: True,
-                K_MATCH: f"^(Credit Card|Bank)\\s*({P_MONEY})"
-            },
-            K_CHEQUE_CODE: {
-                K_EXTRACT_GROUP_INDEX: 2,
-                K_FORMAT_TYPE: K_FLOAT,
-                K_ALLOW_JOINS: True,
-                K_MATCH: f"^(Cheque)\\s*({P_MONEY})"
             }
         },
         K_PRODUCTS: {
