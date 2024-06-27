@@ -195,13 +195,13 @@ def validate_receipt_integrity(receipt_obj):
     return all([
         receipt_obj[config.K_TOTAL_QUANTITY] == receipt_obj[T_TOTAL_QUANTITY],
         receipt_obj[config.K_TOTAL_PRODUCTS] == receipt_obj[T_TOTAL_PRODUCTS],
+        float(sum(receipt_obj[config.K_PAYMENT_MODES].values())) == float(receipt_obj[config.K_TOTAL_AMOUNT]), 
         float(receipt_obj[config.K_TOTAL_AMOUNT]) == float(receipt_obj[T_TOTAL_AMOUNT])
     ])
 
 def parse(text):
     conf = config.get_config(config.K_RECEIPT)
     globals = {
-        config.K_PAYMENT_MODES: {},
         K_PRODUCT_STAGE: {},
         K_PRODUCT_START: False,
         K_PRODUCT_END: False
