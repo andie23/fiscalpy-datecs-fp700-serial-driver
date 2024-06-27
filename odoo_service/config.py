@@ -58,6 +58,10 @@ K_TAX_CODE = "tax_code"
 K_VALIDATE_DATE = "validate_receipt_date"
 K_VALIDATE_ORDER_NUMBER = "validate_receipt_order_number"
 K_ALLOW_JOINS = "allow_joins"
+K_TAX_CODE_A = "A"
+K_TAX_CODE_B = "B"
+K_TAX_CODE_E = "E"
+K_VALUE = "value"
 
 DEFAULT_CONFIG = {
     K_DOWNLOAD_FOLDER: "Downloads",
@@ -146,11 +150,20 @@ DEFAULT_CONFIG = {
                     ],
                     K_MATCH: ".*"
                 },
-                K_TAX_CODE: {
-                    K_EXTRACT_GROUP_INDEX: 0,
-                    K_FORMAT_TYPE: K_STR_UP_CASE,
-                    K_MATCH: "^A|B|E|a|b|e$" # placeholder extraction of tax code
-                },
+                K_TAX_CODE: [
+                    {
+                        K_VALUE: K_TAX_CODE_A,
+                        K_MATCH: "^A$"
+                    },
+                    {
+                        K_VALUE: K_TAX_CODE_B,
+                        K_MATCH: "^B$"
+                    },
+                    {
+                        K_VALUE: K_TAX_CODE_E,
+                        K_MATCH: "^E$"
+                    }
+                ],
                 K_QUANTITY: {
                     K_EXTRACT_GROUP_INDEX: 1,
                     K_FORMAT_TYPE: K_INT,

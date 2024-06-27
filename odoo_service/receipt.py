@@ -69,19 +69,28 @@ def is_parser_object(obj):
     ]
     return any(key in obj for key in spec)
 
+def get_a_value_from_pattern_list(pattern_list, text_line):
+    for item in pattern_list:
+        pattern = re.compile(rf"{item[config.K_MATCH]}", re.IGNORECASE)
+        if re.search(pattern, text_line):
+            return item[config.K_VALUE]
+    return ""
+
 def extract_and_format_data(globals, patterns, text_line):
     data = {**globals}
     for prop, meta in patterns.items():
+        if isinstance(meta, list):
+            data[prop] = get_a_value_from_pattern_list(meta, text_line) 
+            continue
+
         if not is_parser_object(meta):
-            data[prop] = extract_and_format_data(
-                data.get(prop, {}), meta, text_line
-            )
+            data[prop] = extract_and_format_data(data.get(prop, {}), meta, text_line)
             continue
 
         allow_joins = meta.get(config.K_ALLOW_JOINS, False)
-
         if prop in data and not allow_joins:
             continue
+
         # Skip text_lines that match black listed patterns
         if config.K_EXCLUDE_PATTERN in meta:
             blacklist_pattern = re.compile(rf"{'|'.join(meta[config.K_EXCLUDE_PATTERN])}", re.IGNORECASE)
