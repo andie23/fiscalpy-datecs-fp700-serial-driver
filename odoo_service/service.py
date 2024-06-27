@@ -14,10 +14,8 @@ from watchdog.events import FileSystemEventHandler
 class ReceiptHandler(FileSystemEventHandler):
     def on_modified(self, event):
         pattern = re.compile(r".pdf$", re.IGNORECASE)
-
         if not re.findall(pattern, str(event.src_path)):
             return
-
         try:
             txt = pdf_to_text(event.src_path)
             if not receipt.is_receipt_doc_type(txt):
@@ -28,14 +26,14 @@ class ReceiptHandler(FileSystemEventHandler):
             if not data["is_valid"]:
                 return log.error("Can't print an invalid receipt")
 
-            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and receipt_already_received(data["order_number"]):
-                return log.error(f"Order {data['order_number']} was already processed")
+            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and receipt_already_received(data[config.K_ORDER_NUMBER]):
+                return log.error(f"Order {data[config.K_ORDER_NUMBER]} was already processed")
 
-            if config.get_config(config.K_VALIDATE_DATE) and not is_today(data["date"]):
-                return log.error(f"Receipt date of {data['date']} does not match today's date")
+            if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
+                return log.error(f"Receipt date of {data[config.K_DATE]} does not match today's date")
             # TODO: run print command here
             log.info(data)
-            update_received_receipt(data["order_number"], event.src_path)
+            update_received_receipt(data[config.K_ORDER_NUMBER], event.src_path)
         except Exception as error:
             log.error(error)
 
@@ -51,7 +49,6 @@ def pdf_to_text(pdf_path):
             # Concatenate text from all pages
             text += page_text + "\n"
     return text
-
 
 def is_today(date_str):
     given_date = datetime.strptime(date_str, "%Y-%m-%d").date()
