@@ -94,7 +94,7 @@ def print_production_fiscal_receipt(receipt_data):
 
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
-    print_copy = receipt_data.get("print_copy", config.get_config(config.K_PRINT_COPIES))
+    print_copy = receipt_data.get(config.K_PRINT_COPIES, config.get_config(config.K_PRINT_COPIES))
 
     if print_copy:
         receipt_commands.append(cmd.b_print_receipt_copies(1))
@@ -157,7 +157,7 @@ def print_non_production_fiscal_receipt(receipt_data):
     receipt_commands.append(cmd.b_write_free_fiscal_text(f"andiemfune@gmail.com"))
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
-    print_copy = receipt_data.get("print_copy", config.get_config(config.K_PRINT_COPIES))
+    print_copy = receipt_data.get(config.K_PRINT_COPIES, config.get_config(config.K_PRINT_COPIES))
 
     if print_copy:
         receipt_commands.append(cmd.b_print_receipt_copies(1))
