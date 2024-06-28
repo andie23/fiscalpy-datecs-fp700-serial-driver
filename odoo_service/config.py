@@ -195,16 +195,10 @@ DEFAULT_CONFIG = {
             "Email: retail@greymattermw.com": 10,
             "VAT: 6025 | TPIN: 20183266": 10,
             "Odoo POS": 10,
-            "Served by": 5,
-            "CHANGE": 1,
-            "Total No. of Products": 5,
-            "Total Product Qty": 5,
-            "Cash": 1,
-            "Credit/Debit Card": 1,
-            "Credit Card": 1,
-            "Mobile Money": 1,
-            "Cheque": 1,
-            "Bank Transfer": 1
+            P_ODOO_WATER_MARK: 10,
+            P_QUANTITY_AND_PRICE: 10,
+            P_PRODUCT_CODE: 1,
+            "^(Served by)\\s*(\\w*)": 5
         }
     }
 }

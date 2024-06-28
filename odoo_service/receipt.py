@@ -46,13 +46,16 @@ def is_receipt_doc_type(text):
     log.info("Determine doc type")
     indexes = config.get_config(config.K_DOC_IDENTIFICATION_INDEX)
     receipt_score = 0
-
+    counter = 0
     for line in text.split('\n'):
+        if counter >= 1000: #Optimization to prevent iterating over a very large PDF
+            return False
         receipt_score += get_line_index_score(indexes[config.K_RECEIPT], line)
         log.info(f"Line:: {line}, Score:: {receipt_score}")
         if receipt_score >= config.MIN_DOC_IDENTIFICATION_SCORE:
             log.info(f"Receipt file deteced!")
-            return True
+            return True        
+        counter += 1
     return False
 
 def is_parser_object(obj):
