@@ -54,8 +54,8 @@ def print_production_fiscal_receipt(receipt_data):
             code=config.get_config(config.K_OPERATOR_CODE),
             password=config.get_config(config.K_OPERATOR_PASSWORD),
             till=config.get_config(config.K_TILL),
-            buyer=receipt_data["buyer"] or "",
-            buyer_tin=receipt_data["buyer_tin"] or ""
+            buyer=receipt_data.get("buyer", ""),
+            buyer_tin=receipt_data.get("buyer_tin", "")
         ),
         cmd.b_print_seperator_line(),
         cmd.b_write_free_fiscal_text(f"Fiscalpy-{version.SYSTEM_VERSION}"),
@@ -94,10 +94,7 @@ def print_production_fiscal_receipt(receipt_data):
 
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
-    print_copy = config.get_config(config.K_PRINT_COPIES)
-
-    if "print_copy" in receipt_data:
-        print_copy = receipt_data["print_copy"]
+    print_copy = receipt_data.get("print_copy", config.get_config(config.K_PRINT_COPIES))
 
     if print_copy:
         receipt_commands.append(cmd.b_print_receipt_copies(1))
@@ -110,8 +107,8 @@ def print_non_production_fiscal_receipt(receipt_data):
             code=config.get_config(config.K_OPERATOR_CODE),
             password=config.get_config(config.K_OPERATOR_PASSWORD),
             till=config.get_config(config.K_TILL),
-            buyer=receipt_data["buyer"] or "",
-            buyer_tin=receipt_data["buyer_tin"] or ""
+            buyer=receipt_data.get("buyer", ""),
+            buyer_tin=receipt_data.get("buyer_tin", "")
         ),
         cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT!! FOR TESTING ONLY!!"),
         cmd.b_write_free_fiscal_text(f"Call +265 996711617"),
@@ -160,10 +157,7 @@ def print_non_production_fiscal_receipt(receipt_data):
     receipt_commands.append(cmd.b_write_free_fiscal_text(f"andiemfune@gmail.com"))
     receipt_commands.append(cmd.b_fiscal_receipt_closure())
 
-    print_copy = config.get_config(config.K_PRINT_COPIES)
-
-    if "print_copy" in receipt_data:
-        print_copy = receipt_data["print_copy"]
+    print_copy = receipt_data.get("print_copy", config.get_config(config.K_PRINT_COPIES))
 
     if print_copy:
         receipt_commands.append(cmd.b_print_receipt_copies(1))
