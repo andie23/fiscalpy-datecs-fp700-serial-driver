@@ -3,8 +3,6 @@ import json
 
 CONFIG_FILE = "odoo.config.json"
 RECEIVED_RECEIPTS = "Received Receipts"
-MIN_DOC_IDENTIFICATION_SCORE = 40
-
 P_ODOO_WATER_MARK = "Odoo POS\s+\d{2}/\d{2}/\d{2},\s+\d{2}:\d{2}\s*(AM|PM)"
 P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{1,2}"
 P_DATE = "(\\d{4}-\\d{2}-\\d{2}|\\d{2}/\\d{2}/\\d{4}) (\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}|\\d{2}:\\d{2}:\\d{2})"
@@ -194,11 +192,9 @@ DEFAULT_CONFIG = {
             "Grey Matter Limited - Lilongwe Branch": 10,
             "Email: retail@greymattermw.com": 10,
             "VAT: 6025 | TPIN: 20183266": 10,
-            "Odoo POS": 10,
-            P_ODOO_WATER_MARK: 10,
-            P_QUANTITY_AND_PRICE: 10,
-            P_PRODUCT_CODE: 1,
-            "^(Served by)\\s*(\\w*)": 5
+            "^Served by\\s*\\w*": 5,
+            "\\[\\w*\\]": 10,
+            P_QUANTITY_AND_PRICE: 10
         }
     }
 }

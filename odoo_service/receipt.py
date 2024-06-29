@@ -10,6 +10,7 @@ T_TOTAL_PRODUCTS = "_total_products"
 T_TOTAL_QUANTITY = "_total_quantity"
 T_TOTAL_AMOUNT = "_total_amount"
 K_ABS_DISCOUNT = "abs_discount"
+MIN_DOC_IDENTIFICATION_SCORE = 50
 
 def convert_value_to_float(value):
     if isinstance(value, str):
@@ -37,9 +38,11 @@ def format_value(format_type, value):
 
 def get_line_index_score(indexes, text_line):
     for index in indexes:
-        pattern = re.compile(re.escape(index), re.IGNORECASE)
-        if pattern.search(text_line):
-            return indexes[index]
+        pattern = re.compile(index, re.IGNORECASE)
+        if re.search(pattern, text_line):
+            score = indexes[index]
+            log.info(f"Match {text_line} :: {score}")
+            return score
     return 0
 
 def is_receipt_doc_type(text):
@@ -48,11 +51,10 @@ def is_receipt_doc_type(text):
     receipt_score = 0
     counter = 0
     for line in text.split('\n'):
-        if counter >= 1000: #Optimization to prevent iterating over a very large PDF
+        if counter >= 25: #Optimization to prevent iterating over a very large PDF
             return False
         receipt_score += get_line_index_score(indexes[config.K_RECEIPT], line)
-        log.info(f"Line:: {line}, Score:: {receipt_score}")
-        if receipt_score >= config.MIN_DOC_IDENTIFICATION_SCORE:
+        if receipt_score >= MIN_DOC_IDENTIFICATION_SCORE:
             log.info(f"Receipt file deteced!")
             return True        
         counter += 1
