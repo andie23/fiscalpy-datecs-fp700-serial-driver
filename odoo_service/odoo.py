@@ -8,6 +8,8 @@ import receipt
 import log
 import shutil
 import subprocess
+import ctypes
+import sys
 from datetime import datetime
 from pathlib import Path
 from watchdog.observers import Observer
@@ -91,26 +93,44 @@ def update_received_receipt(order_id, original_receipt_path):
     except Exception as e:
         log.info(f"An error occurred: {e}")
 
-if __name__ == "__main__":
-    log.info("Starting PDF tracker")
-    handler = ReceiptHandler()
-    configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
-    target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
-
-    if not os.path.exists(target_dir):
-        log.error(f"Target directory {target_dir} does not exist!")
-        raise NameError(f"Target directory {target_dir} does not exist!")
-    
-    obs = Observer()
-    obs.schedule(handler, path=target_dir)
-    obs.start()
-
-    print(f"👀️ Monitoring directory: {target_dir}")
+def is_win_admin():
     try:
-        while 1:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print(f"✅️ Will stop tracking {target_dir}")
-    finally:
-        obs.stop()
-        obs.join()
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except Exception as error:
+        log.error(error)
+        return False
+
+def elevate_priviledge_in_windows():
+    try:
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, " ".join(sys.argv), None, 1
+        )
+    except Exception as error:
+        log.error(error)
+    
+if __name__ == "__main__":
+    if not is_win_admin():
+        elevate_priviledge_in_windows()
+    else:
+        log.info("Starting odoo service")
+        handler = ReceiptHandler()
+        configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
+        target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
+
+        if not os.path.exists(target_dir):
+            log.error(f"Target directory {target_dir} does not exist!")
+            raise NameError(f"Target directory {target_dir} does not exist!")
+        
+        obs = Observer()
+        obs.schedule(handler, path=target_dir)
+        obs.start()
+
+        print(f"👀️ Monitoring directory: {target_dir}")
+        try:
+            while 1:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print(f"✅️ Will stop tracking {target_dir}")
+        finally:
+            obs.stop()
+            obs.join()
