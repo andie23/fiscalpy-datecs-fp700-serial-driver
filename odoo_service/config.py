@@ -67,7 +67,7 @@ DEFAULT_CONFIG = {
     K_MAX_PDF_PAGES: 5,
     K_VALIDATE_DATE: True,
     K_VALIDATE_ORDER_NUMBER: True,
-    K_PRINTER_SDK: "python ..\\fp700\\fp700.py",
+    K_PRINTER_SDK: "fp700.exe",
     K_RECEIPT: {
         K_META: {
             K_TPIN: {
