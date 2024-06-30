@@ -49,7 +49,7 @@ def print_sales_receipt(data):
     subprocess.run([*get_printer_exe(), "-p", 'j', json.dumps(data)])
 
 def play_printer_beep_sound(count=1):
-    subprocess.run([*get_printer_exe(), "-b", count])
+    subprocess.run([*get_printer_exe(), "-b", f"{count}"])
 
 def pdf_to_text(pdf_path):
     text = ""

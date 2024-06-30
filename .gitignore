@@ -1,8 +1,11 @@
 *.pdf
 *.json
 *.txt
+*.spec
+dist/*
 fp700/dist/*
 odoo_service/build/*
+odoo_service/dist/*
 fp700/build/*
 odoo_service/build/*
 fp700.spec
