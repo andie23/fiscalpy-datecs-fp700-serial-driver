@@ -193,7 +193,7 @@ def set_product_discount_calculations(product):
     _product = {**product }
     _product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
     _product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
-    _product[K_ABS_DISCOUNT] = float(product[TEMP_PRICE]) - float(product[config.K_PRICE])
+    _product[K_ABS_DISCOUNT] = float(_product[TEMP_PRICE]) - float(_product[config.K_PRICE])
     return _product
 
 def validate_receipt_integrity(receipt_obj):

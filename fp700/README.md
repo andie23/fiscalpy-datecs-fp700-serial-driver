@@ -46,7 +46,7 @@ fp700.exe -p c "42::Hello world!"
     "payment_modes": {
         "P": 1.0
     },
-    "sales_item": [
+    "products": [
         {
             "tax_code": "A",
             "name": "Bread",

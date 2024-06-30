@@ -64,7 +64,7 @@ def print_production_fiscal_receipt(receipt_data):
         cmd.b_print_seperator_line()
     ]
 
-    for product in receipt_data["sales_item"]:
+    for product in receipt_data["products"]:
         discount = None
         use_perc_discount = True
         product_name = f"{product['name'].strip()[:config.get_config(config.K_PROD_NAME_LENGTH)]}"
@@ -123,17 +123,17 @@ def print_non_production_fiscal_receipt(receipt_data):
         cmd.b_print_seperator_line()
     ]
 
-    for product in receipt_data["sales_item"]:
+    for product in receipt_data["products"]:
         discount = None
         use_perc_discount = True
         product_name = f"{product['name'].strip()[:config.get_config(config.K_PROD_NAME_LENGTH)]}"
 
-        if "abs_discount" in product:
-            discount = product["abs_discount"]
-            use_perc_discount = False
-        elif "perc_discount" in product:
+        if "perc_discount" in product:
             discount = product["perc_discount"]
             use_perc_discount = True
+        elif "abs_discount" in product:
+            discount = product["abs_discount"]
+            use_perc_discount = False
 
         receipt_commands.append(
             cmd.b_sale_register(
