@@ -39,16 +39,14 @@ def print_fiscal_receipt_from_json(file_location):
         except Exception as error:
             log.error(error)
 
-def print_fiscal_receipt(receipt_data):
+def police():
     try:
         with open('zxabc321.fpy', 'r') as f:
-            if f.read() == ABCD_EFG:
-                return print_production_fiscal_receipt(receipt_data)
+            return f.read() == ABCD_EFG
     except Exception:
-        pass
-    print_non_production_fiscal_receipt(receipt_data)
+        return False
 
-def print_production_fiscal_receipt(receipt_data):
+def print_fiscal_receipt(receipt_data):
     receipt_commands = [
         cmd.b_open_fiscal_receipt(
             code=config.get_config(config.K_OPERATOR_CODE),
@@ -56,8 +54,22 @@ def print_production_fiscal_receipt(receipt_data):
             till=config.get_config(config.K_TILL),
             buyer=receipt_data.get("buyer", ""),
             buyer_tin=receipt_data.get("buyer_tin", "")
-        ),
-        cmd.b_print_seperator_line(),
+        )
+    ]
+    if not police():
+        receipt_commands = [
+            *receipt_commands,
+            cmd.b_print_seperator_line(),
+            cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT!! FOR TESTING ONLY!!"),
+            cmd.b_write_free_fiscal_text(f"You need a license to continue using this product"),
+            cmd.b_write_free_fiscal_text(f"Call: +265 996711617"),
+            cmd.b_write_free_fiscal_text(f"Email: andiemfune@gmail.com"),
+            cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT!! FOR TESTING ONLY!!"),
+            cmd.b_print_seperator_line()
+        ]
+
+    receipt_commands = [
+        *receipt_commands,
         cmd.b_write_free_fiscal_text(f"Fiscalpy-{version.SYSTEM_VERSION}"),
         cmd.b_write_free_fiscal_text(f"Order# {receipt_data['order_number']}"),
         cmd.b_write_free_fiscal_text(f"Served by {receipt_data['user']}"),
@@ -100,68 +112,6 @@ def print_production_fiscal_receipt(receipt_data):
         receipt_commands.append(cmd.b_print_receipt_copies(1))
 
     return printer.run(receipt_commands)
-    
-def print_non_production_fiscal_receipt(receipt_data):
-    receipt_commands = [
-        cmd.b_open_fiscal_receipt(
-            code=config.get_config(config.K_OPERATOR_CODE),
-            password=config.get_config(config.K_OPERATOR_PASSWORD),
-            till=config.get_config(config.K_TILL),
-            buyer=receipt_data.get("buyer", ""),
-            buyer_tin=receipt_data.get("buyer_tin", "")
-        ),
-        cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT!! FOR TESTING ONLY!!"),
-        cmd.b_write_free_fiscal_text(f"Call +265 996711617"),
-        cmd.b_write_free_fiscal_text(f"Fiscalpy-{version.SYSTEM_VERSION}"),
-        cmd.b_write_free_fiscal_text(f"andiemfune@gmail.com"),
-        cmd.b_print_seperator_line(),
-        cmd.b_write_free_fiscal_text(f"Order# {receipt_data['order_number']}"),
-        cmd.b_write_free_fiscal_text(f"Served by {receipt_data['user']}"),
-        cmd.b_print_seperator_line(),
-        cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT FOR TESTING ONLY!!"),
-        cmd.b_write_free_fiscal_text(f"Call +265 996711617"),
-        cmd.b_print_seperator_line()
-    ]
-
-    for product in receipt_data["products"]:
-        discount = None
-        use_perc_discount = True
-        product_name = f"{product['name'].strip()[:config.get_config(config.K_PROD_NAME_LENGTH)]}"
-
-        if "perc_discount" in product:
-            discount = product["perc_discount"]
-            use_perc_discount = True
-        elif "abs_discount" in product:
-            discount = product["abs_discount"]
-            use_perc_discount = False
-
-        receipt_commands.append(
-            cmd.b_sale_register(
-               product["tax_code"],
-               item=product_name,
-               price=product["price"],
-               quantity=product["quantity"],
-               discount_value=discount,
-               use_perc_discount=use_perc_discount
-            )
-        )
- 
-    for p_code, p_amount in receipt_data["payment_modes"].items():
-        if p_code not in cmd.SUPPORTED_PAYMENT_TYPE:
-            raise Exception(f"{p_code} is not a valid payment code found in {cmd.SUPPORTED_PAYMENT_TYPE}")
-        receipt_commands.append(cmd.b_calculate_totals(p_code, p_amount))
-
-    receipt_commands.append(cmd.b_print_seperator_line()),
-    receipt_commands.append(cmd.b_write_free_fiscal_text(f"THIS IS A FAKE RECEIPT FOR TESTING ONLY!!"))
-    receipt_commands.append(cmd.b_write_free_fiscal_text(f"Call +265 996711617"))
-    receipt_commands.append(cmd.b_write_free_fiscal_text(f"andiemfune@gmail.com"))
-    receipt_commands.append(cmd.b_fiscal_receipt_closure())
-
-    print_copy = receipt_data.get(config.K_PRINT_COPIES, config.get_config(config.K_PRINT_COPIES))
-
-    if print_copy:
-        receipt_commands.append(cmd.b_print_receipt_copies(1))
-    printer.run(receipt_commands)
 
 def beep_printer(count):
     beeps = []
