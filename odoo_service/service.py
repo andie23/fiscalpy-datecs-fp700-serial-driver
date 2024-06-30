@@ -38,7 +38,7 @@ class ReceiptHandler(FileSystemEventHandler):
                 return log.error(f"Receipt date of {data[config.K_DATE]} does not match today's date")
             
             print_sales_receipt(data)
-            # update_received_receipt(data[config.K_ORDER_NUMBER], event.src_path)
+            update_received_receipt(data[config.K_ORDER_NUMBER], event.src_path)
         except Exception as error:
             log.error(error)
 
