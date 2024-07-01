@@ -224,6 +224,7 @@ if __name__ == '__main__':
         data = printer.discover()
         if data:
             config.update("Port", data["port"])
+            beep_printer(2)
             print(f"Port: {data['port']}")
             print(f"Name: {data['device']['name']}")
             print(f"Serial: {data['device']['serial']}")
