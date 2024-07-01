@@ -8,7 +8,7 @@ P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{1,2}"
 P_DATE = "(\\d{4}-\\d{2}-\\d{2}|\\d{2}/\\d{2}/\\d{4}) (\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}|\\d{2}:\\d{2}:\\d{2})"
 P_QUANTITY_AND_PRICE = f"(\\d*)\\s*x\\s*({P_MONEY})" 
 P_URL = "\\b((?:[a-zA-Z][a-zA-Z0-9+.-]*):\/\/[^\s/$.?#].[^\s]*)\\b"
-P_PRODUCT_CODE = "\\[\\w*\\]"
+P_PRODUCT_CODE = "\\[(\\w*)\\]"
 K_TOTAL_AMOUNT = "total_amount"
 K_PRODUCT_TERMINATION = 'product_termination'
 K_PRODUCT_START = 'begin_after'
@@ -133,7 +133,7 @@ DEFAULT_CONFIG = {
             K_PRODUCT_TERMINATION: P_QUANTITY_AND_PRICE,
             K_PRODUCT: {
                 K_PRODUCT_CODE: {
-                    K_EXTRACT_GROUP_INDEX: 0,
+                    K_EXTRACT_GROUP_INDEX: 1,
                     K_MATCH: P_PRODUCT_CODE
                 },
                 K_PRODUCT_NAME: {
