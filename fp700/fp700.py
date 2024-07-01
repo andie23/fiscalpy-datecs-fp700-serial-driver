@@ -72,7 +72,7 @@ def print_fiscal_receipt(receipt_data):
         *receipt_commands,
         cmd.b_write_free_fiscal_text(f"Fiscalpy-{version.SYSTEM_VERSION}"),
         cmd.b_write_free_fiscal_text(f"Order# {receipt_data['order_number']}"),
-        cmd.b_write_free_fiscal_text(f"Served by {receipt_data['user']}"),
+        cmd.b_write_free_fiscal_text(f"Served by {receipt_data.get('user', 'N/A')}"),
         cmd.b_print_seperator_line()
     ]
 
