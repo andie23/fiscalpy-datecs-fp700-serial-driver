@@ -63,7 +63,6 @@ def is_receipt_doc_type(text):
 
 def is_parser_object(obj):
     spec = [
-        config.K_EXTRACT_GROUP_INDEX,
         config.K_FORMAT_TYPE,
         config.K_MATCH,
         config.K_ALLOW_JOINS,
@@ -108,10 +107,7 @@ def extract_and_format_data(globals, patterns, text_line):
             continue
 
         # Format values if dictionary defines such
-        value = format_value(
-            pattern_meta.get(config.K_FORMAT_TYPE, config.K_STR), 
-            matches.group(pattern_meta[config.K_EXTRACT_GROUP_INDEX])
-        )
+        value = format_value(pattern_meta.get(config.K_FORMAT_TYPE, config.K_STR), matches.group(1))
 
         if prop in data and allow_joins:
             data[prop] = join_to_existing_value(pattern_meta, data[prop], value)
