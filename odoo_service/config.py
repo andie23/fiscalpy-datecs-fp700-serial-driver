@@ -81,7 +81,7 @@ DEFAULT_CONFIG = {
                 K_CREDIT_CODE: f"^(?:Credit\s*Card|Bank)\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})",
                 K_CHEQUE_CODE: f"^Cheque\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})"
             },
-            K_ORDER_NUMBER: f"^Order\s*(?P<{TYPE_STR}>\d{5}-\d{3}-\d{4})",
+            K_ORDER_NUMBER: fr"^Order\s*(?P<{TYPE_STR}>\d{{5}}-\d{{3}}-\d{{4}})",
             K_DATE: f"^(?P<{TYPE_DATE}>{P_DATE})\s*(?:{P_TIME})$"
         },
         K_PRODUCTS: {
