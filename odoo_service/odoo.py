@@ -24,19 +24,17 @@ class ReceiptHandler(FileSystemEventHandler):
                 return
 
             data = receipt.parse(txt)
-            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(data[config.K_ORDER_NUMBER]):
-                play_printer_beep_sound(3)
-                return log.error("Receipt was archived")
+            order_number = data[config.K_ORDER_NUMBER]
+            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
+                return print_error_receipt(f"Remove {order_number} in folder", 3)
             else:
                 archive_receipt(data)
 
             if not data["is_valid"]:
-                play_printer_beep_sound(2)
-                return log.error("Can't print an invalid receipt")
+                return print_error_receipt("Validation failed", 2)
 
             if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
-                play_printer_beep_sound(3)
-                return log.error(f"Receipt date of {data[config.K_DATE]} does not match today's date")
+                return print_error_receipt(f"Prohibited date: {data[config.K_DATE]}", 3)
 
             print_sales_receipt(data)
         except Exception as error:
@@ -44,6 +42,12 @@ class ReceiptHandler(FileSystemEventHandler):
 
 def get_printer_exe():
     return config.get_config(config.K_PRINTER_SDK).split(" ")
+
+def print_error_receipt(message, beep_count):
+    log.error(message)
+    play_printer_beep_sound(beep_count)
+    if config.get_config(config.K_ENABLE_ERROR_RECEIPTS):
+        subprocess.run([*get_printer_exe(), "-p", 'e', message])
 
 def print_sales_receipt(data):
     subprocess.run([*get_printer_exe(), "-p", 'j', json.dumps(data)])

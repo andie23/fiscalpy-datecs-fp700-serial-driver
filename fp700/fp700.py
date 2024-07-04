@@ -46,6 +46,20 @@ def police():
     except Exception:
         return False
 
+def print_error_message(message):
+    receipt_commands = [
+        cmd.b_open_none_fiscal_receipt(),
+        cmd.b_print_seperator_line(),
+        cmd.b_write_free_fiscal_text("*****RECEIPT ERROR*******"),
+        cmd.b_print_seperator_line(),
+        cmd.b_write_free_fiscal_text(message),
+        cmd.b_print_seperator_line(),
+        cmd.b_write_free_fiscal_text("*****RECEIPT ERROR*******"),
+        cmd.b_print_seperator_line(),
+        cmd.b_close_non_fiscal_receipt()
+    ]
+    printer.run(receipt_commands)
+
 def print_fiscal_receipt(receipt_data):
     receipt_commands = [
         cmd.b_open_fiscal_receipt(
@@ -125,7 +139,8 @@ def handle_arg_print(type, argument):
         "cf": lambda: run_commands_from_file(argument),
         "j": lambda: print_fiscal_receipt(json.loads(argument)),
         "c": lambda: printer.run([text_to_printer_command(argument)]),
-        "d": lambda: printer.run([cmd.b_print_diagnostics()])
+        "d": lambda: printer.run([cmd.b_print_diagnostics()]),
+        "e": lambda: print_error_message(argument)
     }
 
     if type not in options:

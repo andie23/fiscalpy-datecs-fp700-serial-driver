@@ -55,6 +55,7 @@ K_TAX_CODE_E = "E"
 K_VALUE = "value"
 K_PRINTER_SDK = "printer_sdk"
 K_DATE = "date"
+K_ENABLE_ERROR_RECEIPTS = "enable_error_receipts"
 TYPE_STR = "TYPE_STRING"
 TYPE_INT = "TYPE_NUMBER"
 TYPE_DATE = "TYPE_DATE"
@@ -67,6 +68,7 @@ DEFAULT_CONFIG = {
     K_MAX_PDF_PAGES: 5,
     K_VALIDATE_DATE: True,
     K_VALIDATE_ORDER_NUMBER: True,
+    K_ENABLE_ERROR_RECEIPTS: True,
     K_PRINTER_SDK: "fp700.exe",
     K_RECEIPT: {
         K_META: {
