@@ -26,15 +26,22 @@ def convert_value_to_date(value):
 
 def format_value(format_type, value):
     FORMAT_TYPES = {
-        config.K_STR: lambda value: str(value),
-        config.K_INT: lambda value: int(value),
-        config.K_STR_UP_CASE: lambda value: f"{value}".upper(),
-        config.K_DATE: convert_value_to_date,
-        config.K_FLOAT: convert_value_to_float
+        config.TYPE_STR: lambda value: str(value),
+        config.TYPE_INT: lambda value: int(value),
+        config.TYPE_DATE: convert_value_to_date,
+        config.TYPE_FLOAT: convert_value_to_float,
+        config.TYPE_MULTI_LINE_STR: lambda value: str(value),
+        config.TYPE_MULTI_LINE_FLOAT: convert_value_to_float
     }
     if not format_type in FORMAT_TYPES:
         return value
     return FORMAT_TYPES[format_type](value)
+
+def is_extendable_prop(format_type):
+    return format_type in [
+        config.TYPE_MULTI_LINE_FLOAT,
+        config.TYPE_MULTI_LINE_STR
+    ]
 
 def get_line_index_score(indexes, text_line):
     for index in indexes:
@@ -61,15 +68,6 @@ def is_receipt_doc_type(text):
     log.info("not a receipt")
     return False
 
-def is_parser_object(obj):
-    spec = [
-        config.K_FORMAT_TYPE,
-        config.K_MATCH,
-        config.K_ALLOW_JOINS,
-        config.K_EXCLUDE_PATTERN
-    ]
-    return any(key in obj for key in spec)
-
 def get_a_value_from_pattern_list(pattern_list, text_line):
     for item in pattern_list:
         pattern = re.compile(rf"{item[config.K_MATCH]}", re.IGNORECASE)
@@ -77,57 +75,47 @@ def get_a_value_from_pattern_list(pattern_list, text_line):
             return item[config.K_VALUE]
     return ""
 
+def resolve_value(pattern, text_line):
+    matches = re.compile(rf"{pattern}", re.IGNORECASE).search(text_line)
+    if not matches:
+        return None
+
+    for format_type, value in matches.groupdict().items():
+        return { "value": format_value(format_type, value), "format": format_type }
+
+def extend_value(format_type, existing_value, new_value):
+    if format_type in [config.TYPE_MULTI_LINE_STR, config.TYPE_STR]:
+        return f"{existing_value} {new_value}"
+
+    elif format_type in [config.TYPE_FLOAT, config.TYPE_MULTI_LINE_FLOAT]:
+        return float(existing_value) + float(new_value)
+
+    elif format_type == config.TYPE_INT:
+        return int(existing_value) + int(new_value)
+    return new_value
+
 def extract_and_format_data(globals, patterns, text_line):
     data = {**globals}
-    for prop, pattern_meta in patterns.items():
-        if isinstance(pattern_meta, list):
+    for prop, pattern in patterns.items():
+        if isinstance(pattern, list):
             if not data.get(prop, False):
-                data[prop] = get_a_value_from_pattern_list(pattern_meta, text_line) 
+                data[prop] = get_a_value_from_pattern_list(pattern, text_line) 
             continue
 
-        if not is_parser_object(pattern_meta):
-            data[prop] = extract_and_format_data(data.get(prop, {}), pattern_meta, text_line)
-            continue
-        
-        allow_joins = pattern_meta.get(config.K_ALLOW_JOINS, False)
-        # ignore props which have values already set, else append them to existing values
-        if prop in data and not allow_joins:
+        if isinstance(pattern, dict):
+            data[prop] = extract_and_format_data(data.get(prop, {}), pattern, text_line)
             continue
 
-        # Skip text_lines that match black listed patterns
-        if config.K_EXCLUDE_PATTERN in pattern_meta:
-            blacklist_pattern = re.compile(rf"{'|'.join(pattern_meta[config.K_EXCLUDE_PATTERN])}", re.IGNORECASE)
-            if blacklist_pattern.search(text_line):
-                continue
+        result = resolve_value(pattern, text_line)
 
-        required_pattern = re.compile(rf"{pattern_meta[config.K_MATCH]}", re.IGNORECASE)
-        matches = required_pattern.search(text_line)
-
-        if not matches:
+        if not result:
             continue
 
-        # Format values if dictionary defines such
-        value = format_value(pattern_meta.get(config.K_FORMAT_TYPE, config.K_STR), matches.group(1))
-
-        if prop in data and allow_joins:
-            data[prop] = join_to_existing_value(pattern_meta, data[prop], value)
-        else:
-            data[prop] = value
+        if prop in data and is_extendable_prop(result["format"]):
+            data[prop] = extend_value(result["format"], data[prop], result["value"])
+        elif prop not in data:
+            data[prop] = result["value"]
     return data
-
-def join_to_existing_value(pattern_meta, existing_value, new_value):
-    if config.K_FORMAT_TYPE in pattern_meta:
-        value_type = pattern_meta[config.K_FORMAT_TYPE]
-
-        if value_type == config.K_STR:
-            return f"{existing_value} {new_value}"
-        
-        elif value_type == config.K_FLOAT:
-            return float(existing_value) + float(new_value)
-
-        elif value_type == config.K_INT:
-            return int(existing_value) + int(new_value)
-    return new_value
 
 def init_product_line(data):
     _data = {**data}
@@ -215,7 +203,5 @@ def parse(text):
             globals = extract_and_format_data(globals, conf[config.K_META], line)
         if not globals[K_PRODUCT_END]:
             globals = extract_product(globals, conf[config.K_PRODUCTS], line)
-    return {
-        "is_valid": validate_receipt_integrity(globals),
-        **globals
-    }
+    return { "is_valid": validate_receipt_integrity(globals), **globals }
+
