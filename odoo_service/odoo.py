@@ -14,10 +14,11 @@ from watchdog.events import FileSystemEventHandler
 
 class ReceiptHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        pattern = re.compile(r".pdf$", re.IGNORECASE)
-        if not re.findall(pattern, str(event.src_path)):
-            return
         try:
+            pattern = re.compile(r".pdf$", re.IGNORECASE)
+            if not re.findall(pattern, str(event.src_path)):
+                return
+
             txt = pdf_to_text(event.src_path)
             if not receipt.is_receipt_doc_type(txt):
                 return
@@ -39,7 +40,7 @@ class ReceiptHandler(FileSystemEventHandler):
 
             print_sales_receipt(data)
         except Exception as error:
-            log.error(error)
+            log.error(f"General error: {error}")
 
 def get_printer_exe():
     return config.get_config(config.K_PRINTER_SDK).split(" ")
@@ -69,14 +70,21 @@ def is_today(date_str):
     return given_date == current_date
 
 def archive_receipt(receipt_data):
-    order_number = receipt_data[config.K_ORDER_NUMBER]
-    log.info(f"archiving receipt number: {order_number}")
-    with open(f"history/{order_number}.json", "w") as f:
-        json.dump(receipt_data, f, indent=4)
-        log.info("Archive successful")
+    try:    
+        directory = Path(config.RECEIVED_RECEIPTS)
+        if not directory.exists():
+            directory.mkdir(parents=True, exist_ok=True)
+        order_number = receipt_data[config.K_ORDER_NUMBER]
+        log.info(f"archiving receipt number: {order_number}")
+        with open(Path(directory / f"{order_number}.json"), "w") as f:
+            json.dump(receipt_data, f, indent=4)
+            log.info("Archive successful")
+    except Exception as e:
+        log.error(e)
 
 def is_receipt_archived(order_number):
-    path = Path(Path(f"history") / f"{order_number}.json")
+    directory = Path(config.RECEIVED_RECEIPTS)
+    path = Path(directory / f"{order_number}.json")
     return path.is_file()
 
 if __name__ == "__main__":
