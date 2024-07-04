@@ -109,6 +109,8 @@ def elevate_priviledge_in_windows():
         log.error(error)
     
 if __name__ == "__main__":
+    txt = pdf_to_text("Odoo POS_With Discount (1).pdf")
+    print(receipt.parse(txt))
     if not is_win_admin():
         elevate_priviledge_in_windows()
     else:
