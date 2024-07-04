@@ -6,10 +6,7 @@ import pdfplumber
 import config
 import receipt
 import log
-import shutil
 import subprocess
-import ctypes
-import sys
 from datetime import datetime
 from pathlib import Path
 from watchdog.observers import Observer
@@ -26,21 +23,21 @@ class ReceiptHandler(FileSystemEventHandler):
                 return
 
             data = receipt.parse(txt)
-            log.info(data)
+            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(data[config.K_ORDER_NUMBER]):
+                play_printer_beep_sound(3)
+                return log.error("Receipt was archived")
+            else:
+                archive_receipt(data)
+
             if not data["is_valid"]:
                 play_printer_beep_sound(2)
                 return log.error("Can't print an invalid receipt")
 
-            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and receipt_already_received(data[config.K_ORDER_NUMBER]):
-                play_printer_beep_sound(3)
-                return log.error(f"Order {data[config.K_ORDER_NUMBER]} was already processed")
-
             if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
                 play_printer_beep_sound(3)
                 return log.error(f"Receipt date of {data[config.K_DATE]} does not match today's date")
-            
+
             print_sales_receipt(data)
-            update_received_receipt(data[config.K_ORDER_NUMBER], event.src_path)
         except Exception as error:
             log.error(error)
 
@@ -71,66 +68,37 @@ def is_today(date_str):
     current_date = datetime.now().date()
     return given_date == current_date
 
-def receipt_already_received(order_number):
-    dir = Path(f"{config.RECEIVED_RECEIPTS}")
-    path = Path(dir / f"{order_number}.pdf")
+def archive_receipt(receipt_data):
+    order_number = receipt_data[config.K_ORDER_NUMBER]
+    log.info(f"archiving receipt number: {order_number}")
+    with open(f"history/{order_number}.json", "w") as f:
+        json.dump(receipt_data, f, indent=4)
+        log.info("Archive successful")
+
+def is_receipt_archived(order_number):
+    path = Path(Path(f"history") / f"{order_number}.json")
     return path.is_file()
 
-def update_received_receipt(order_id, original_receipt_path):
-    try:
-        directory = Path(config.RECEIVED_RECEIPTS)
-
-        # Ensure the destination directory exists
-        if not directory.exists():
-            directory.mkdir(parents=True, exist_ok=True)
-
-        # Define the destination path
-        destination_path = directory / f"{order_id}.pdf"
-
-        # Move the file
-        shutil.move(original_receipt_path, destination_path)
-        log.info(f"Saved PDF as {destination_path}")
-    except Exception as e:
-        log.info(f"An error occurred: {e}")
-
-def is_win_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except Exception as error:
-        log.error(error)
-        return False
-
-def elevate_priviledge_in_windows():
-    try:
-        ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, " ".join(sys.argv), None, 1
-        )
-    except Exception as error:
-        log.error(error)
-    
 if __name__ == "__main__":
-    if not is_win_admin():
-        elevate_priviledge_in_windows()
-    else:
-        log.info("Starting odoo service")
-        handler = ReceiptHandler()
-        configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
-        target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
+    log.info("Starting odoo service")
+    handler = ReceiptHandler()
+    configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
+    target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
 
-        if not os.path.exists(target_dir):
-            log.error(f"Target directory {target_dir} does not exist!")
-            raise NameError(f"Target directory {target_dir} does not exist!")
-        
-        obs = Observer()
-        obs.schedule(handler, path=target_dir)
-        obs.start()
+    if not os.path.exists(target_dir):
+        log.error(f"Target directory {target_dir} does not exist!")
+        raise NameError(f"Target directory {target_dir} does not exist!")
+    
+    obs = Observer()
+    obs.schedule(handler, path=target_dir)
+    obs.start()
 
-        print(f"👀️ Monitoring directory: {target_dir}")
-        try:
-            while 1:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print(f"✅️ Will stop tracking {target_dir}")
-        finally:
-            obs.stop()
-            obs.join()
+    print(f"👀️ Monitoring directory: {target_dir}")
+    try:
+        while 1:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print(f"✅️ Will stop tracking {target_dir}")
+    finally:
+        obs.stop()
+        obs.join()
