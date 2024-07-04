@@ -58,7 +58,7 @@ def is_receipt_doc_type(text):
     receipt_score = 0
     line_counter = 0
     for line in text.split('\n'):
-        if line_counter >= 15: #Optimization to prevent iterating over a very large PDF
+        if line_counter >= 10: #Optimization to prevent iterating over a very large PDF
             return False
         line_counter += 1
         receipt_score += get_line_index_score(indexes[config.K_RECEIPT], line)
