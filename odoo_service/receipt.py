@@ -91,7 +91,6 @@ def extend_value(format_type, existing_value, new_value):
         return float(existing_value) + float(new_value)
 
     elif format_type == config.TYPE_INT:
-        print("Ariba!", existing_value, new_value)
         return int(existing_value) + int(new_value)
     return new_value
 

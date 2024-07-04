@@ -5,7 +5,7 @@ CONFIG_FILE = "odoo.config.json"
 RECEIVED_RECEIPTS = "Received Receipts"
 P_ODOO_WATER_MARK = "Odoo POS\s+\d{2}/\d{2}/\d{2},\s+\d{2}:\d{2}\s*(AM|PM)"
 P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{1,2}"
-P_DATE = "\\d{4}[-/]\\d{2}[-/]\\d{2}"
+P_DATE = "\\d{4}-\\d{2}-\\d{2}|\\d{2}/\\d{2}/\\d{4}"
 P_TIME = "\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}|\\d{2}:\\d{2}:\\d{2}"
 P_QUANTITY_AND_PRICE = f"(\\d*)\\s*x\\s*({P_MONEY})" 
 P_URL = "((?:[a-zA-Z][a-zA-Z0-9+.-]*):\/\/[^\s/$.?#].[^\s]*)"
@@ -23,7 +23,6 @@ K_TPIN = 'tpin'
 K_TOTAL_PRODUCTS = 'total_products'
 K_TOTAL_QUANTITY = 'total_quantity'
 K_ORDER_NUMBER = 'order_number'
-TYPE_DATE = 'date'
 K_CASH_CODE = 'P'
 K_CREDIT_CODE = 'N'
 K_CHEQUE_CODE = 'C'
@@ -83,7 +82,7 @@ DEFAULT_CONFIG = {
                 K_CHEQUE_CODE: f"^Cheque\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})"
             },
             K_ORDER_NUMBER: f"^Order\s*(?P<{TYPE_STR}>\d{5}-\d{3}-\d{4})",
-            K_DATE: f"^(?P<{TYPE_DATE}>{P_DATE})\s*{P_TIME}$"
+            K_DATE: f"^(?P<{TYPE_DATE}>{P_DATE})\s*(?:{P_TIME})$"
         },
         K_PRODUCTS: {
             K_PRODUCT_START: "^-*$",
