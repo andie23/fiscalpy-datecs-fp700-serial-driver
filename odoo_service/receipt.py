@@ -48,12 +48,10 @@ def get_line_index_score(indexes, text_line):
         pattern = re.compile(index, re.IGNORECASE)
         if re.search(pattern, text_line):
             score = indexes[index]
-            log.info(f"Match {text_line} :: {score}")
             return score
     return 0
 
 def is_receipt_doc_type(text):
-    log.info("Determine doc type")
     indexes = config.get_config(config.K_DOC_IDENTIFICATION_INDEX)
     receipt_score = 0
     line_counter = 0
@@ -65,7 +63,6 @@ def is_receipt_doc_type(text):
         if receipt_score >= MIN_DOC_IDENTIFICATION_SCORE:
             log.info(f"Receipt file deteced!")
             return True        
-    log.info("not a receipt")
     return False
 
 def get_a_value_from_pattern_list(pattern_list, text_line):
