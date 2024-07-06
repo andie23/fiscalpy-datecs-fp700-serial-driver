@@ -36,7 +36,7 @@ class ReceiptHandler(FileSystemEventHandler):
                 return print_error_receipt("Undefined payment method")
 
             if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
-                return print_error_receipt(f"Wrong sale date: {data[config.K_DATE]}")
+                return print_error_receipt(f"Wrong sale date {data[config.K_DATE]}")
 
             if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
                 return print_error_receipt(f"Already printed {order_number}")
@@ -53,7 +53,7 @@ def print_error_receipt(message, beep_count=5):
     log.error(message)
     play_printer_beep_sound(beep_count)
     if config.get_config(config.K_ENABLE_ERROR_RECEIPTS):
-        subprocess.run([*get_printer_exe(), "-p", 'e', message])
+        subprocess.run([*get_printer_exe(), "-p", 'e', f"{message}"])
 
 def print_sales_receipt(data):
     subprocess.run([*get_printer_exe(), "-p", 'j', json.dumps(data)])
