@@ -24,18 +24,24 @@ class ReceiptHandler(FileSystemEventHandler):
                 return
 
             data = receipt.parse(txt)
-            order_number = data[config.K_ORDER_NUMBER]
-            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
-                return print_error_receipt(f"Remove {order_number} in folder", 3)
-            else:
-                archive_receipt(data)
+            order_number = data.get(config.K_ORDER_NUMBER, None)
 
             if not data["is_valid"]:
-                return print_error_receipt("Validation failed", 2)
+                return print_error_receipt("Invalid receipt")
+
+            if not order_number:
+                return print_error_receipt("Missing Order#")
+
+            if not data.get(config.K_PAYMENT_MODES, False):
+                return print_error_receipt("Undefined payment method")
 
             if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
-                return print_error_receipt(f"Prohibited date: {data[config.K_DATE]}", 3)
+                return print_error_receipt(f"Wrong sale date: {data[config.K_DATE]}")
 
+            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
+                return print_error_receipt(f"Already printed {order_number}")
+
+            archive_receipt(data)
             print_sales_receipt(data)
         except Exception as error:
             log.error(f"General error: {error}")
@@ -43,7 +49,7 @@ class ReceiptHandler(FileSystemEventHandler):
 def get_printer_exe():
     return config.get_config(config.K_PRINTER_SDK).split(" ")
 
-def print_error_receipt(message, beep_count):
+def print_error_receipt(message, beep_count=5):
     log.error(message)
     play_printer_beep_sound(beep_count)
     if config.get_config(config.K_ENABLE_ERROR_RECEIPTS):
