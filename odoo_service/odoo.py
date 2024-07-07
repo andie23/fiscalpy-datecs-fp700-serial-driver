@@ -41,8 +41,8 @@ class ReceiptHandler(FileSystemEventHandler):
             if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
                 return print_error_receipt(f"Already printed {order_number}")
 
-            archive_receipt(data)
             print_sales_receipt(data)
+            archive_receipt(data)
         except Exception as error:
             log.error(f"General error: {error}")
 
