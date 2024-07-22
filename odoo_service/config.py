@@ -74,8 +74,8 @@ DEFAULT_CONFIG = {
         K_META: {
             K_TPIN: fr"TPIN:\s*(?P<{TYPE_INT}>\d*)",
             K_USER: fr"Served\s*by\s*(?P<{TYPE_STR}>.*)",
-            K_TOTAL: "^(TOTAL)$",
-            K_TOTAL_AMOUNT: f"^(?P<{TYPE_FLOAT}>{P_MONEY})\s*MWK$",
+            K_ORDER_NUMBER: fr"Order\\s*(?P<{TYPE_STR}>\d{{5}}-\d{{3}}-\d{{4}})$",
+            K_TOTAL_AMOUNT: f"^Sub\\s*Total\\s*(?P<{TYPE_FLOAT}>{P_MONEY})$",
             K_TOTAL_QUANTITY: f"Total\s*Product\s*Qty\s*(?P<{TYPE_INT}>\d*)",
             K_TOTAL_PRODUCTS: f"Total\s*No.\s*of\s*Products\s*(?P<{TYPE_INT}>\d*)",
             K_PAYMENT_MODES: {
@@ -83,11 +83,15 @@ DEFAULT_CONFIG = {
                 K_CREDIT_CODE: f"^(?:Credit\s*Card|Bank)\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})",
                 K_CHEQUE_CODE: f"^Cheque\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})"
             },
-            K_ORDER_NUMBER: fr"^Order\s*(?P<{TYPE_STR}>\d{{5}}-\d{{3}}-\d{{4}})",
             K_DATE: f"^(?P<{TYPE_DATE}>{P_DATE})\s*(?:{P_TIME})$"
         },
+        K_DISCOUNT: {
+            K_TAX_CODE_A: f"Discount\s*\((?<{TYPE_INT}>\d*)%,\s*Tax:\s*\d*%\)",
+            K_TAX_CODE_B: f"Discount\s*\((?<{TYPE_INT}>\d*)%,\s*Tax:\s*\d*%\)",
+            K_TAX_CODE_E: f"Discount\s*\((?<{TYPE_INT}>\d*)%,\s*Tax:\s*\d*%\)"
+        },
         K_PRODUCTS: {
-            K_PRODUCT_START: "^-*$",
+            K_PRODUCT_START: "^Order Ref:",
             K_PRODUCT_END: "^-*$",
             K_PRODUCT_TERMINATION: P_QUANTITY_AND_PRICE,
             K_PRODUCT: {
@@ -96,15 +100,15 @@ DEFAULT_CONFIG = {
                 K_TAX_CODE: [
                     {
                         K_VALUE: K_TAX_CODE_A,
-                        K_MATCH: "^A$"
+                        K_MATCH: f"^{P_QUANTITY_AND_PRICE}\\s*{P_MONEY}{K_TAX_CODE_A}{1}^"
                     },
                     {
                         K_VALUE: K_TAX_CODE_B,
-                        K_MATCH: "^B$"
+                        K_MATCH: f"^{P_QUANTITY_AND_PRICE}\\s*{P_MONEY}{K_TAX_CODE_B}{1}^"
                     },
                     {
                         K_VALUE: K_TAX_CODE_E,
-                        K_MATCH: "^E$"
+                        K_MATCH: f"^{P_QUANTITY_AND_PRICE}\\s*{P_MONEY}{K_TAX_CODE_E}{1}^"
                     }
                 ],
                 K_QUANTITY: f"(?P<{TYPE_INT}>\d*)\s*x\s*(?:{P_MONEY})",
