@@ -102,7 +102,7 @@ if __name__ == "__main__":
     handler = ReceiptHandler()
     configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
     target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
-
+    
     if not os.path.exists(target_dir):
         log.error(f"Target directory {target_dir} does not exist!")
         raise NameError(f"Target directory {target_dir} does not exist!")
@@ -112,6 +112,7 @@ if __name__ == "__main__":
     obs.start()
 
     print(f"👀️ Monitoring directory: {target_dir}")
+    play_printer_beep_sound(2)
     try:
         while 1:
             time.sleep(1)
