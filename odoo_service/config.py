@@ -74,8 +74,7 @@ DEFAULT_CONFIG = {
         K_META: {
             K_TPIN: fr"TPIN:\s*(?P<{TYPE_INT}>\d*)",
             K_USER: fr"Served\s*by\s*(?P<{TYPE_STR}>.*)",
-            K_TOTAL: "^(TOTAL)$",
-            K_TOTAL_AMOUNT: f"^(?P<{TYPE_FLOAT}>{P_MONEY})\s*MWK$",
+            K_TOTAL_AMOUNT: f"Sub\\s*Total\\s*(?P<{TYPE_FLOAT}>{P_MONEY})",
             K_TOTAL_QUANTITY: f"Total\s*Product\s*Qty\s*(?P<{TYPE_INT}>\d*)",
             K_TOTAL_PRODUCTS: f"Total\s*No.\s*of\s*Products\s*(?P<{TYPE_INT}>\d*)",
             K_PAYMENT_MODES: {
@@ -83,30 +82,16 @@ DEFAULT_CONFIG = {
                 K_CREDIT_CODE: f"^(?:Credit\s*Card|Bank)\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})",
                 K_CHEQUE_CODE: f"^Cheque\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})"
             },
-            K_ORDER_NUMBER: fr"^Order\s*(?P<{TYPE_STR}>\d{{5}}-\d{{3}}-\d{{4}})",
+            K_ORDER_NUMBER: fr"^Order\s*Ref:\w*\s*Order\s*(?P<{TYPE_STR}>\d{{5}}-\d{{3}}-\d{{4}})",
             K_DATE: f"^(?P<{TYPE_DATE}>{P_DATE})\s*(?:{P_TIME})$"
         },
         K_PRODUCTS: {
-            K_PRODUCT_START: "^-*$",
+            K_PRODUCT_START: f"^Order\s*Ref:\w*\s*Order\s*\d{{5}}-\d{{3}}-\d{{4}}",
             K_PRODUCT_END: "^-*$",
             K_PRODUCT_TERMINATION: P_QUANTITY_AND_PRICE,
             K_PRODUCT: {
-                K_PRODUCT_CODE: f"\[(?P<{TYPE_STR}>\w*)\]",
-                K_PRODUCT_NAME: f"^(?!{P_ODOO_WATER_MARK}|{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|{P_DATE}|{P_TIME}|{P_URL}|Line\s*Discount\s*\w*)(?P<{TYPE_MULTI_LINE_STR}>.*)",
-                K_TAX_CODE: [
-                    {
-                        K_VALUE: K_TAX_CODE_A,
-                        K_MATCH: "^A$"
-                    },
-                    {
-                        K_VALUE: K_TAX_CODE_B,
-                        K_MATCH: "^B$"
-                    },
-                    {
-                        K_VALUE: K_TAX_CODE_E,
-                        K_MATCH: "^E$"
-                    }
-                ],
+                K_PRODUCT_NAME: f"^(?!{P_ODOO_WATER_MARK}|Discount\s*(\d*%,\s*Tax:\s*\d*%)|{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|{P_DATE}|{P_TIME}|{P_URL}|Line\s*Discount\s*\w*)(?P<{TYPE_MULTI_LINE_STR}>.*)",
+                K_TAX_CODE: f"{P_QUANTITY_AND_PRICE}\\s*{P_MONEY}(?P<{TYPE_STR}>[ABE]{{1}})",
                 K_QUANTITY: f"(?P<{TYPE_INT}>\d*)\s*x\s*(?:{P_MONEY})",
                 K_PRICE: f"\d*\s*x\s*(?P<{TYPE_FLOAT}>{P_MONEY})",
                 K_TOTAL_BEFORE_DISCOUNT: f"^(?P<{TYPE_FLOAT}>{P_MONEY})$",
@@ -116,11 +101,11 @@ DEFAULT_CONFIG = {
     },
     K_DOC_IDENTIFICATION_INDEX: {
         K_RECEIPT: {
-            "Grey Matter Limited - Lilongwe Branch": 10,
+            "Odoo\\s*POS": 30,
+            "Grey Matter Limited": 10,
             "Email: retail@greymattermw.com": 10,
-            "VAT: 6025 | TPIN: 20183266": 10,
-            "^Served by\s*\w*": 5,
-            "\[\w*\]": 10,
+            "VAT\\s*Reg.No:\\s*6025\\s*,\\s*TPIN:\\s*20183266": 10,
+            "^Served\\s*by\\s*\\w*": 10,
             P_QUANTITY_AND_PRICE: 10
         }
     }

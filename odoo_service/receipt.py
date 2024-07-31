@@ -126,7 +126,6 @@ def init_product_line(data):
 
 def is_valid_product_obj(the_object):
     return all([
-        the_object.get(config.K_PRODUCT_CODE, False),
         the_object.get(config.K_PRODUCT_NAME, False),
         the_object.get(config.K_PRICE, False),
         the_object.get(config.K_QUANTITY, False)
