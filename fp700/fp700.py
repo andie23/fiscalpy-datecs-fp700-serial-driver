@@ -144,7 +144,7 @@ def handle_arg_print(type, argument):
     }
 
     if type not in options:
-        raise Exception(f"Invalid command '{type}'")
+        raise Exception(f"Invalid print command type '{type}'")
     
     if not argument:
         raise Exception(f"Argument is required for command {type}")
