@@ -13,6 +13,7 @@ from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import traceback
+import argparse
 
 class ReceiptHandler(FileSystemEventHandler):
     def on_created(self, event):
@@ -114,7 +115,7 @@ def is_admin():
     except:
         return False
 
-if __name__ == "__main__":
+def start_service():
     if not is_admin():
         log.info("Requesting admin access...")
         # Re-run the script with admin privileges
@@ -149,3 +150,29 @@ if __name__ == "__main__":
         finally:
             obs.stop()
             obs.join()
+
+def reprint_order():
+    try:
+        order_number = str(input("Please enter order number:  "))
+        if not order_number:
+            return log.error("Invalid Order number")
+        directory = Path(config.RECEIVED_RECEIPTS)
+        with open(Path(directory /f"{order_number}.json"), "r") as file:
+            data = json.load(file)
+            log.info("Printing receipt")
+            print_sales_receipt(data)
+    except FileNotFoundError:
+        log.error(f"Unable to find order file {order_number}")
+    except json.JSONDecodeError:
+        log.error(f"Error decoding Order file {order_number}")
+    except Exception as error:
+        log.error(error)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Odoo fiscal utility service")
+    parser.add_argument('-rp', '--reprint', const='0', nargs='?', type=str)
+    args = parser.parse_args()
+    if args.reprint:
+        reprint_order()
+    else:
+        start_service()
