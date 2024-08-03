@@ -1,5 +1,6 @@
 import os
-import re
+import ctypes
+import sys
 import json
 import time
 import pdfplumber
@@ -11,55 +12,62 @@ from datetime import datetime
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import traceback
 
 class ReceiptHandler(FileSystemEventHandler):
-    def on_modified(self, event):
-        try:
-            pattern = re.compile(r".pdf$", re.IGNORECASE)
-            if not re.findall(pattern, str(event.src_path)):
-                return
+    def on_created(self, event):
+        if not event.is_directory and event.src_path.endswith(".pdf"):
+            try:
+                time.sleep(1)
+                txt = pdf_to_text(event.src_path)
 
-            txt = pdf_to_text(event.src_path)
-            if not receipt.is_receipt_doc_type(txt):
-                return
+                if not receipt.is_receipt_doc_type(txt):
+                    return
 
-            data = receipt.parse(txt)
-            order_number = data.get(config.K_ORDER_NUMBER, None)
+                data = receipt.parse(txt)
+                order_number = data.get(config.K_ORDER_NUMBER, None)
 
-            if not data["is_valid"]:
-                return print_error_receipt("Invalid receipt")
+                if not data["is_valid"]:
+                    return print_error_receipt("Invalid receipt")
 
-            if not order_number:
-                return print_error_receipt("Missing Order#")
+                if not order_number:
+                    return print_error_receipt("Missing Order#")
 
-            if not data.get(config.K_PAYMENT_MODES, False):
-                return print_error_receipt("Undefined payment method")
+                if not data.get(config.K_PAYMENT_MODES, False):
+                    return print_error_receipt("Undefined payment method")
 
-            if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
-                return print_error_receipt(f"Wrong sale date {data[config.K_DATE]}")
+                if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
+                    return print_error_receipt(f"Wrong sale date {data[config.K_DATE]}")
 
-            if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
-                return print_error_receipt(f"Already printed {order_number}")
+                if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
+                    return print_error_receipt(f"Already printed {order_number}")
+                log.info("Printing receipt")
+                print_sales_receipt(data)
+                archive_receipt(data)
+            except Exception as error:
+                log.error(f"General error: {error}")
+                traceback.print_exc()
 
-            print_sales_receipt(data)
-            archive_receipt(data)
-        except Exception as error:
-            log.error(f"General error: {error}")
-
-def get_printer_exe():
-    return config.get_config(config.K_PRINTER_SDK).split(" ")
+def run_printer_sdk(params):
+    try:
+        sdk = config.get_config(config.K_PRINTER_SDK).split(" ")
+        subprocess.run([*sdk, *params])
+    except FileNotFoundError:
+        log.error(f"Unable to find Printer sdk {sdk}")
+    except Exception as e:
+        log.error(f"Error running printer skd: {e}")
 
 def print_error_receipt(message, beep_count=5):
     log.error(message)
     play_printer_beep_sound(beep_count)
     if config.get_config(config.K_ENABLE_ERROR_RECEIPTS):
-        subprocess.run([*get_printer_exe(), "-p", 'e', f"{message}"])
+        run_printer_sdk(["-p", 'e', f"{message}"])
 
 def print_sales_receipt(data):
-    subprocess.run([*get_printer_exe(), "-p", 'j', json.dumps(data)])
+    run_printer_sdk(["-p", 'j', json.dumps(data)])
 
 def play_printer_beep_sound(count=1):
-    subprocess.run([*get_printer_exe(), "-b", f"{count}"])
+    run_printer_sdk(["-b", f"{count}"])
 
 def pdf_to_text(pdf_path):
     text = ""
@@ -97,27 +105,44 @@ def is_receipt_archived(order_number):
     path = Path(directory / f"{order_number}.json")
     return path.is_file()
 
-if __name__ == "__main__":
-    log.info("Starting odoo service")
-    handler = ReceiptHandler()
-    configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
-    target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
-    
-    if not os.path.exists(target_dir):
-        log.error(f"Target directory {target_dir} does not exist!")
-        raise NameError(f"Target directory {target_dir} does not exist!")
-    
-    obs = Observer()
-    obs.schedule(handler, path=target_dir)
-    obs.start()
-
-    print(f"👀️ Monitoring directory: {target_dir}")
-    play_printer_beep_sound(2)
+def is_admin():
     try:
-        while 1:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print(f"✅️ Will stop tracking {target_dir}")
-    finally:
-        obs.stop()
-        obs.join()
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+if __name__ == "__main__":
+    if not is_admin():
+        log.info("Requesting admin access...")
+        # Re-run the script with admin privileges
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, " ".join(sys.argv), None, 1
+        )
+    else:
+        log.info("Starting odoo service")
+        handler = ReceiptHandler()
+        configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
+        target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
+        
+        if not os.path.exists(target_dir):
+            log.error(f"Target directory {target_dir} does not exist!")
+            raise NameError(f"Target directory {target_dir} does not exist!")
+        
+        obs = Observer()
+        obs.schedule(handler, path=target_dir)
+        obs.start()
+        log.info(f"👀️ Monitoring directory: {target_dir}")
+
+        try:
+            play_printer_beep_sound(2)
+        except Exception:
+            log.info("Unable to open printer...")
+
+        try:
+            while 1:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            log.info(f"✅️ Will stop tracking {target_dir}")
+        finally:
+            obs.stop()
+            obs.join()
