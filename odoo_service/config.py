@@ -106,7 +106,7 @@ DEFAULT_CONFIG = {
             "Email: retail@greymattermw.com": 10,
             "VAT\\s*Reg.No:\\s*6025\\s*,\\s*TPIN:\\s*20183266": 10,
             "^Served\\s*by\\s*\\w*": 10,
-            P_QUANTITY_AND_PRICE: 10
+            P_QUANTITY_AND_PRICE: 20
         }
     }
 }

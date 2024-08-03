@@ -56,7 +56,7 @@ def is_receipt_doc_type(text):
     receipt_score = 0
     line_counter = 0
     for line in text.split('\n'):
-        if line_counter >= 15: #Optimization to prevent iterating over a very large PDF
+        if line_counter >= 50: #Optimization to prevent iterating over a very large PDF
             return False
         line_counter += 1
         receipt_score += get_line_index_score(indexes[config.K_RECEIPT], line)
@@ -177,6 +177,9 @@ def set_product_discount_calculations(product):
     _product[K_ABS_DISCOUNT] = float(_product[TEMP_PRICE]) - float(_product[config.K_PRICE])
     return _product
 
+def all_products_have_tax_code(receipt):
+    return all(["tax_code" in product for product in receipt["products"]])
+
 def validate_receipt_integrity(receipt_obj):
     payment_mode_amounts = receipt_obj[config.K_PAYMENT_MODES].values()
     payment_mode_amounts = [float(amount) for amount in payment_mode_amounts]
@@ -199,5 +202,8 @@ def parse(text):
             globals = extract_and_format_data(globals, conf[config.K_META], line)
         if not globals[K_PRODUCT_END]:
             globals = extract_product(globals, conf[config.K_PRODUCTS], line)
-    return { "is_valid": validate_receipt_integrity(globals), **globals }
+    return { 
+        "has_valid_tax_codes": all_products_have_tax_code(globals),
+        "is_valid": validate_receipt_integrity(globals), **globals 
+    }
 

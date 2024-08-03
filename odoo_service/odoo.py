@@ -18,7 +18,7 @@ class ReceiptHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith(".pdf"):
             try:
-                time.sleep(1)
+                time.sleep(0.8)
                 txt = pdf_to_text(event.src_path)
 
                 if not receipt.is_receipt_doc_type(txt):
@@ -26,6 +26,9 @@ class ReceiptHandler(FileSystemEventHandler):
 
                 data = receipt.parse(txt)
                 order_number = data.get(config.K_ORDER_NUMBER, None)
+
+                if not data["has_valid_tax_codes"]:
+                    return print_error_receipt("Missing/invalid tax codes")
 
                 if not data["is_valid"]:
                     return print_error_receipt("Invalid receipt")
