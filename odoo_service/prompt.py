@@ -16,6 +16,7 @@ def reprint_order():
         util.print_archived(order_number)
         print("Operation complete...")
     else:
+        print("")
         print(f"Order {order_number} not found")
         reprint_order()
 
@@ -27,6 +28,7 @@ def print_pdf():
         util.print_from_pdf(os.path.join(parent_dir, filename))
     except Exception as error:
         log.error(error)
+        print("")
         print_pdf()
     
 def test_receipt():
@@ -37,9 +39,11 @@ def test_receipt():
     if option == "y":
         print("Printer is ok")
     if option == "n":
+        print("")
         print("Please check your cable connection")
         test_receipt()
     else:
+        print("")
         print("please enter y for Yes or n for No")
         test_receipt()
 
@@ -63,7 +67,7 @@ def main():
         print(f"{num}) {data['title']}")
 
     print("")
-    input_selection = str(input("Please enter option #: "))
+    input_selection = str(input("Please enter option#: "))
     if input_selection not in OPTIONS:
         print(f"Invalid option {input_selection}")
         main()
