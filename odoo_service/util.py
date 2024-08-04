@@ -7,6 +7,7 @@ import subprocess
 import pdfplumber
 from pathlib import Path
 from datetime import datetime
+import receipt
 
 def is_admin():
     try:
@@ -78,7 +79,35 @@ def is_receipt_archived(order_number):
     path = Path(directory / f"{order_number}.json")
     return path.is_file()
 
-def print_from_file(order_number):
+def print_from_pdf(path):
+    txt = pdf_to_text(path)
+    if not receipt.is_receipt_doc_type(txt):
+        return
+    data = receipt.parse(txt)
+    order_number = data.get(config.K_ORDER_NUMBER, None)
+
+    if not data["has_valid_tax_codes"]:
+        return print_error_receipt("Missing/invalid tax codes")
+
+    if not data["is_valid"]:
+        return print_error_receipt("Invalid receipt")
+
+    if not order_number:
+        return print_error_receipt("Missing Order#")
+
+    if not data.get(config.K_PAYMENT_MODES, False):
+        return print_error_receipt("Undefined payment method")
+
+    if config.get_config(config.K_VALIDATE_DATE) and not is_today(data[config.K_DATE]):
+        return print_error_receipt(f"Wrong sale date {data[config.K_DATE]}")
+
+    if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and is_receipt_archived(order_number):
+        return print_error_receipt(f"Already printed {order_number}")
+    log.info("Printing receipt")
+    print_sales_receipt(data)
+    archive_receipt(data)
+
+def print_archived(order_number):
     try:
         directory = Path(config.RECEIVED_RECEIPTS)
         with open(Path(directory /f"{order_number}.json"), "r") as file:

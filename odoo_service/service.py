@@ -1,7 +1,6 @@
 import os
 import time
 import config
-import receipt
 import log
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -13,34 +12,7 @@ class ReceiptHandler(FileSystemEventHandler):
         if not event.is_directory and event.src_path.endswith(".pdf"):
             try:
                 time.sleep(0.8)
-                txt = util.pdf_to_text(event.src_path)
-
-                if not receipt.is_receipt_doc_type(txt):
-                    return
-
-                data = receipt.parse(txt)
-                order_number = data.get(config.K_ORDER_NUMBER, None)
-
-                if not data["has_valid_tax_codes"]:
-                    return util.print_error_receipt("Missing/invalid tax codes")
-
-                if not data["is_valid"]:
-                    return util.print_error_receipt("Invalid receipt")
-
-                if not order_number:
-                    return util.print_error_receipt("Missing Order#")
-
-                if not data.get(config.K_PAYMENT_MODES, False):
-                    return util.print_error_receipt("Undefined payment method")
-
-                if config.get_config(config.K_VALIDATE_DATE) and not util.is_today(data[config.K_DATE]):
-                    return util.print_error_receipt(f"Wrong sale date {data[config.K_DATE]}")
-
-                if config.get_config(config.K_VALIDATE_ORDER_NUMBER) and util.is_receipt_archived(order_number):
-                    return util.print_error_receipt(f"Already printed {order_number}")
-                log.info("Printing receipt")
-                util.print_sales_receipt(data)
-                util.archive_receipt(data)
+                util.print_from_pdf(event.src_path)
             except Exception as error:
                 log.error(f"General error: {error}")
                 traceback.print_exc()

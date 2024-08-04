@@ -11,7 +11,7 @@ def reprint_order():
 
     if util.is_receipt_archived(order_number):
         print(f"Reprinting {order_number}")
-        util.print_from_file(order_number)
+        util.print_archived(order_number)
         print("Operation complete...")
         main()
     else:
