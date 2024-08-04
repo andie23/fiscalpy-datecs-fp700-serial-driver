@@ -31,19 +31,19 @@ def run_printer_sdk(params):
         log.error(f"Unable to find Printer sdk {sdk}")
     except Exception as e:
         log.error(f"Error running printer skd: {e}")
-        
+
 def print_error_receipt(message, beep_count=5):
     log.error(message)
     play_printer_beep_sound(beep_count)
     if config.get_config(config.K_ENABLE_ERROR_RECEIPTS):
-        run_printer_sdk(["-p", 'e', f"{message}"])
+        run_printer_sdk(["-pe", f"{message}"])
 
 def print_sales_receipt(data):
     run_printer_sdk(["-p", 'j', json.dumps(data)])
 
 def play_printer_beep_sound(count=1):
     run_printer_sdk(["-b", f"{count}"])
-    
+
 def pdf_to_text(pdf_path):
     text = ""
     with pdfplumber.open(pdf_path) as pdf:
