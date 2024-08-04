@@ -4,6 +4,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import traceback
 import util
+import version
 
 class ReceiptHandler(FileSystemEventHandler):
     def on_created(self, event):
@@ -16,6 +17,7 @@ class ReceiptHandler(FileSystemEventHandler):
                 traceback.print_exc()
 
 def start_service():
+    log.info(f"Service version: {version.SYSTEM_VERSION}")
     log.info("Starting PDF service")
     handler = ReceiptHandler()
     target_dir = util.get_receipt_directory()
