@@ -139,8 +139,7 @@ def handle_arg_print(type, argument):
         "cf": lambda: run_commands_from_file(argument),
         "j": lambda: print_fiscal_receipt(json.loads(argument)),
         "c": lambda: printer.run([text_to_printer_command(argument)]),
-        "d": lambda: printer.run([cmd.b_print_diagnostics()]),
-        "e": lambda: print_error_message(argument)
+        "d": lambda: printer.run([cmd.b_print_diagnostics()])
     }
 
     if type not in options:
@@ -160,6 +159,7 @@ if __name__ == '__main__':
         metavar=('TYPE', 'ARGUMENT'),
         help='Specify the type and the value. E.g., -p d "c:\\mra" or -p r "43::Hello world"'
     )
+    parser.add_argument('-pe', '--printErrorMessage', type=str, help="Print  plain error text message")
     parser.add_argument('-b', '--beep', const=1, type=int, nargs='?', help="Play beeping sound on the printer")
     parser.add_argument('-ap', '--activePorts', const='0', nargs="?", help="Find all active ports")
     parser.add_argument('-d', '--deviceLocation', const='0', nargs="?", help="Detect FP700 Printer and set device port")
@@ -177,6 +177,9 @@ if __name__ == '__main__':
     parser.add_argument('-cd', '--commandDelay', type=float, help="Set wait time till another printer command is run")
 
     args = parser.parse_args()
+
+    if args.printErrorMessage:
+        print_error_message(args.printErrorMessage)
 
     if args.print:
         try:
