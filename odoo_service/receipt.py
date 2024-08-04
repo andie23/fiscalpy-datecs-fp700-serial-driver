@@ -61,7 +61,7 @@ def is_receipt_doc_type(text):
         line_counter += 1
         receipt_score += get_line_index_score(indexes[config.K_RECEIPT], line)
         if receipt_score >= MIN_DOC_IDENTIFICATION_SCORE:
-            log.info(f"Receipt file deteced!")
+            log.info(f"Receipt file detected!")
             return True        
     return False
 

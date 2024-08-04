@@ -8,6 +8,7 @@ import pdfplumber
 from pathlib import Path
 from datetime import datetime
 import receipt
+import os
 
 def is_admin():
     try:
@@ -80,9 +81,14 @@ def is_receipt_archived(order_number):
     return path.is_file()
 
 def print_from_pdf(path):
+    if not path.endswith(".pdf"):
+        raise Exception("Invalid file")
+    
     txt = pdf_to_text(path)
     if not receipt.is_receipt_doc_type(txt):
+        print("Detected a non receipt PDF")
         return
+
     data = receipt.parse(txt)
     order_number = data.get(config.K_ORDER_NUMBER, None)
 
@@ -106,6 +112,15 @@ def print_from_pdf(path):
     log.info("Printing receipt")
     print_sales_receipt(data)
     archive_receipt(data)
+
+def get_receipt_directory():
+    configured_dir = config.get_config(config.K_DOWNLOAD_FOLDER)
+    target_dir = os.path.join(os.path.expanduser('~'), configured_dir)
+
+    if not os.path.exists(target_dir):
+        log.error(f"Target directory {target_dir} does not exist!")
+        raise NameError(f"Target directory {target_dir} does not exist!")
+    return target_dir
 
 def print_archived(order_number):
     try:
