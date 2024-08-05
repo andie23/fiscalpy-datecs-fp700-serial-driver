@@ -126,3 +126,10 @@ def read_config():
 def override_config_file(config):
     with open(CONFIG_FILE, 'w') as f:
         json.dump(config, f, indent=4)
+
+def update(attribute, value):
+    if not attribute in DEFAULT_CONFIG:
+        raise Exception(f"{attribute} is invalid")
+    current_config = read_config()
+    current_config[attribute] = value
+    override_config_file(current_config)
