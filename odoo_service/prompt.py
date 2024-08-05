@@ -10,7 +10,7 @@ def print_error(message):
     print("")
     print(message)
     print("")
-    print("*********************ERROR***********")
+    print("*********************ERROR********************")
 
 def print_title(title):
     print("")
@@ -21,6 +21,7 @@ def prompt_free_text(message):
     '''
     Input prompt for Strings only
     '''
+    print("")
     return str(input(f"{message}: ")).strip()
 
 def prompt_selection(message, options):
@@ -94,7 +95,6 @@ def test_receipt():
 
 def receipt_settings():
     print_title("Receipt Settings")
-
     def set_error_receipts():
         print_title("Print Errors")
         selection = prompt_selection("Do you want to print error receipts?", [
@@ -111,7 +111,7 @@ def receipt_settings():
             if os.path.exists(target_dir):
                 config.update(config.K_DOWNLOAD_FOLDER, val)
             else:
-                print_error("Invalid /Folder exist")                
+                print_error("Invalid/Folder exist")                
         except:
             print_error("Error occured validating path provided")
 
@@ -152,13 +152,13 @@ def printer_settings():
     def set_baudrate():
         print_title("Baudrate")
         selection = prompt_selection("Select Baudrate", [
-            { "title": 115200 },
-            { "title": 57600  },
-            { "title": 38400  },
-            { "title": 28800  },
-            { "title": 19200  },
-            { "title": 14400  },
-            { "title": 9600   }
+            { "title": "115200" },
+            { "title": "57600"  },
+            { "title": "38400"  },
+            { "title": "28800"  },
+            { "title": "19200"  },
+            { "title": "14400"  },
+            { "title": "9600"   }
         ])
         if selection:
             util.run_printer_sdk(["--baudrate", selection["title"]])
@@ -189,13 +189,10 @@ def printer_settings():
     def set_copies():
         print_title("Receipt Copies")
         selection = prompt_selection("Do you want to print Receipt Copies?", [
-            { "title": "Yes" }, 
-            { "title": "No" }
+            { "title": "Yes", "action": lambda: util.run_printer_sdk(["--allowCopies", "true"]) }, 
+            { "title": "No", "action": lambda: util.run_printer_sdk(["--allowCopies", "false"]) }
         ])
-        if selection:
-            util.run_printer_sdk(["--allowCopies", selection["title"] == "Yes"])
-        else:
-            print("Invalid Option selected")
+        selection["action"]()
 
     def set_operator_code():
         print_title("Operator Code")
@@ -236,7 +233,7 @@ def main():
     try:
         selection["action"]()
     except:
-        print("Invalid Option")
+        print_error("Invalid Option")
     main()
 
 if __name__ == "__main__":

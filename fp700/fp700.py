@@ -164,12 +164,12 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--version', const='0', nargs="?", help="Show current version")
     parser.add_argument('-r', '--resetConfig', const='0', nargs="?", help="Reset default configurations")
     parser.add_argument('-po', '--port', type=str, help="Update printer port")
-    parser.add_argument('-ba', '--baudrate', type=int, help="Set baudrate")
-    parser.add_argument('-c', '--allowCopies', type=bool, help="After printing a sale, prints a copy")
-    parser.add_argument('-t', '--till', type=int, help="Set till number")
+    parser.add_argument('-ba', '--baudrate', type=str, help="Set baudrate")
+    parser.add_argument('-c', '--allowCopies', type=str, help="After printing a sale, prints a copy")
+    parser.add_argument('-t', '--till', type=str, help="Set till number")
     parser.add_argument('-tp', '--tpin', type=str, help="Add TPIN code to validate against printed receipts")
     parser.add_argument('-il', '--itemNameLength', type=int, help="Limit item name to a maximum number of characters before cutoff")
-    parser.add_argument('-oc', '--operatorCode', type=int, help="Set operator code as programmed in the printer")
+    parser.add_argument('-oc', '--operatorCode', type=str, help="Set operator code as programmed in the printer")
     parser.add_argument('-op', '--operatorPassword', type=str, help="Set operator password as programmed in the printer")
     parser.add_argument('-st', '--showPaymentTypes', const='0', nargs='?', type=str)
     parser.add_argument('-cd', '--commandDelay', type=float, help="Set wait time till another printer command is run")
@@ -210,10 +210,10 @@ if __name__ == '__main__':
         config.update("Port", args.port)
 
     if args.baudrate:
-        config.update("Baudrate", args.baudrate)
+        config.update("Baudrate", int(args.baudrate))
 
     if args.allowCopies:
-        config.update("Print Copies", args.allowCopies)
+        config.update("Print Copies", args.allowCopies == "true")
 
     if args.tpin:
         config.update("Tpin", args.tpin)
