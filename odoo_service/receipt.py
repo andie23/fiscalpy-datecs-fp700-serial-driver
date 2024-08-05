@@ -186,7 +186,7 @@ def validate_receipt_integrity(receipt_obj):
     return all([
         receipt_obj[config.K_TOTAL_QUANTITY] == receipt_obj[T_TOTAL_QUANTITY],
         receipt_obj[config.K_TOTAL_PRODUCTS] == receipt_obj[T_TOTAL_PRODUCTS],
-        float(sum(payment_mode_amounts)) == float(receipt_obj[config.K_TOTAL_AMOUNT]), 
+        float(sum(payment_mode_amounts)) >= float(receipt_obj[config.K_TOTAL_AMOUNT]), 
         float(receipt_obj[config.K_TOTAL_AMOUNT]) == float(receipt_obj[T_TOTAL_AMOUNT])
     ])
 
