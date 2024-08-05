@@ -9,12 +9,15 @@ from pathlib import Path
 from datetime import datetime
 import receipt
 import os
+import platform
 
 def is_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
+    if platform.system() == "Windows":
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            return False
+    return True
 
 def run_as_admin():
     log.info("Requesting admin access...")
