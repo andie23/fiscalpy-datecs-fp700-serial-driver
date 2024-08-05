@@ -47,7 +47,7 @@ def print_pdf():
 
     try:
         parent_dir = util.get_receipt_directory()
-        print(f"Receipt Folder" {parent_dir}")
+        print(f"Receipt Folder {parent_dir}")
         filename = prompt_free_text("Please specify Filename")
         util.print_from_pdf(os.path.join(parent_dir, filename))
     except Exception as error:
