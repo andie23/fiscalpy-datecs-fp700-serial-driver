@@ -50,11 +50,9 @@ def print_error_message(message):
     receipt_commands = [
         cmd.b_open_none_fiscal_receipt(),
         cmd.b_print_seperator_line(),
-        cmd.b_write_free_fiscal_text("*****RECEIPT ERROR*******"),
-        cmd.b_print_seperator_line(),
-        cmd.b_write_free_fiscal_text(message),
-        cmd.b_print_seperator_line(),
-        cmd.b_write_free_fiscal_text("*****RECEIPT ERROR*******"),
+        cmd.b_write_free_text("**RECEIPT ERROR**"),
+        cmd.b_write_free_text(message),
+        cmd.b_write_free_text("**RECEIPT ERROR**"),
         cmd.b_print_seperator_line(),
         cmd.b_close_non_fiscal_receipt()
     ]
