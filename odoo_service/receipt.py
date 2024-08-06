@@ -171,10 +171,10 @@ def update_product_data_calculations(globals, product):
 def set_product_discount_calculations(product):
     if config.K_DISCOUNT not in product:
         return product
-    _product = {**product }
+    _product = {**product}
     _product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
     _product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
-    _product[K_ABS_DISCOUNT] = float(_product[TEMP_PRICE]) - float(_product[config.K_PRICE])
+    _product[K_ABS_DISCOUNT] = (float(_product[TEMP_PRICE]) - float(_product[config.K_PRICE])) * _product[config.K_QUANTITY]
     return _product
 
 def all_products_have_tax_code(receipt):
