@@ -131,7 +131,16 @@ def receipt_settings():
         ])
         selection["action"]()
 
+    def set_discount_mode():
+        print_title("Discount Calculation Mode")
+        selection = prompt_selection("How should discounts be calculated/displayed?", [
+            { "title": "Discount Percentage (Recommended)", "action": lambda: config.update(config.K_CALCULATE_ABS_DISCOUNT, False) },
+            { "title": "Absolute Discount", "action": lambda: config.update(config.K_CALCULATE_ABS_DISCOUNT, True) }                     
+        ])
+        selection["action"]()
+
     selection = prompt_selection("Select option#", [
+      { "title": "Discount Calculation Mode", "action": set_discount_mode },
       { "title": "Print Error Receipts", "action": set_error_receipts },
       { "title": "Receipt Folder", "action": set_receipt_folder },
       { "title": "Validate Sales Date", "action": set_date_validation },

@@ -55,6 +55,7 @@ K_TAX_CODE_E = "E"
 K_VALUE = "value"
 K_PRINTER_SDK = "printer_sdk"
 K_DATE = "date"
+K_CALCULATE_ABS_DISCOUNT = "calculate_abs_discount"
 K_ENABLE_ERROR_RECEIPTS = "enable_error_receipts"
 TYPE_STR = "TYPE_STRING"
 TYPE_INT = "TYPE_NUMBER"
@@ -70,6 +71,7 @@ DEFAULT_CONFIG = {
     K_VALIDATE_ORDER_NUMBER: True,
     K_ENABLE_ERROR_RECEIPTS: True,
     K_PRINTER_SDK: "fp700.exe",
+    K_CALCULATE_ABS_DISCOUNT: True,
     K_RECEIPT: {
         K_META: {
             K_TPIN: fr"TPIN:\s*(?P<{TYPE_INT}>\d*)",

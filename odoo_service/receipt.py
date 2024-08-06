@@ -173,8 +173,11 @@ def set_product_discount_calculations(product):
         return product
     _product = {**product}
     _product[config.K_PRICE] = float(product[config.K_TOTAL_BEFORE_DISCOUNT]) / product[config.K_QUANTITY]
-    _product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
-    _product[K_ABS_DISCOUNT] = (float(_product[TEMP_PRICE]) - float(_product[config.K_PRICE])) * _product[config.K_QUANTITY]
+    if config.get_config(config.K_CALCULATE_ABS_DISCOUNT):
+        _product[K_ABS_DISCOUNT] = (float(_product[TEMP_PRICE]) - float(_product[config.K_PRICE])) * _product[config.K_QUANTITY]
+    else:
+        # Percentage discount
+        _product[config.K_DISCOUNT] = f"-{product[config.K_DISCOUNT]}"
     return _product
 
 def all_products_have_tax_code(receipt):
