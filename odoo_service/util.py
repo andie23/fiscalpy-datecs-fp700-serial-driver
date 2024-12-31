@@ -146,18 +146,44 @@ def list_files_in_receipt_folder(limit=10):
     return sorted(items, key=lambda f: f["modified"], reverse=True)[:limit]
 
 def extract_payment_methods_from_regex_string(regex_string):
-    return re.search(r"\(?:([^)]+)\)", regex_string).group(1).split('|')
+    return re.search(r"\(?:([^)]+)\)", regex_string).group(1)
 
-def list_payment_methods():
-    p_types = config.get_config(config.K_RECEIPT)[config.K_META][config.K_PAYMENT_MODES]
-    code_map = {
+def get_payment_types():
+    return {
         config.K_CASH_CODE: "Cash Payment Category",
         config.K_CHEQUE_CODE: "Cheque Payment Category",
         config.K_CREDIT_CODE: "Credit Payment Category"
     }
+
+def update_payment_method(method_code, updated_list): 
+    conf = config.get_config(config.K_RECEIPT)
+    payment_modes = conf[config.K_META][config.K_PAYMENT_MODES]
+    regex_string = payment_modes[method_code]
+    str_payments = extract_payment_methods_from_regex_string(regex_string)
+    updated_regex = regex_string.replace(str_payments, '|'.join(updated_list))
+    data = {
+        **conf,
+        config.K_META: {
+            **conf[config.K_META],
+            config.K_PAYMENT_MODES: {
+                **payment_modes,
+                method_code: updated_regex
+            }
+        }  
+    }
+    config.update(config.K_RECEIPT, data)
+
+def list_payment_methods_by_type(p_type):
+    regex_string = config.get_config(config.K_RECEIPT)[config.K_META][config.K_PAYMENT_MODES][p_type]
+    val = extract_payment_methods_from_regex_string(regex_string).split('|')
+    return val if val else []
+    
+def list_payment_methods():
+    p_types = config.get_config(config.K_RECEIPT)[config.K_META][config.K_PAYMENT_MODES]
+    code_map = get_payment_types()
     methods = []
     for code, value in p_types.items():
-        val = extract_payment_methods_from_regex_string(value)
+        val = extract_payment_methods_from_regex_string(value).split('|')
         if val:
             methods.append({"cat": code_map[code], "code": code, "values": val})        
     return methods

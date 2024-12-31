@@ -157,12 +157,34 @@ def test_receipt():
 
 def receipt_settings():
     print_title("Receipt Settings")
+    
+    def add_payment_method():
+        print_title("Add new payment method")
+        code_selection = prompt_selection("Select payment category", [
+            { "title": "Cash (P)", "value": config.K_CASH_CODE },
+            { "title": "Cheque (c)", "value": config.K_CHEQUE_CODE },
+            { "title": "Credit (N)", "value": config.K_CREDIT_CODE}
+        ])
+        
+        print(code_selection["value"])
+        
+        payment_method_name = prompt_free_text("Payment method name")
+        
+        print(payment_method_name)
+        
+        if payment_method_name and code_selection:
+            p_types = [*util.list_payment_methods_by_type(code_selection["value"])]
+            p_types.append(payment_method_name)
+            util.update_payment_method(code_selection["value"], p_types)
+        else:
+            print_error("Invalid payment method")
+
     def show_payment_methods():
         print_title("Supported payment methods")
         methods = util.list_payment_methods()
         for method in methods:
             print("")
-            print(f"{method["cat"]} {method["code"]}")
+            print(f"{method['cat']} {method['code']}")
             for val in method["values"]:
                 print("")
                 print(f"==> {val}")
@@ -218,6 +240,7 @@ def receipt_settings():
       { "title": "Validate Sales Date", "action": set_date_validation },
       { "title": "Archive Receipts After Printing", "action": set_receipt_archiving },
       { "title": "Supported payment methods", "action": show_payment_methods },
+      { "title": "Add payment method", "action": add_payment_method },
       { "title": "Main Menu", "action": lambda: print("") }
     ])
     try:
