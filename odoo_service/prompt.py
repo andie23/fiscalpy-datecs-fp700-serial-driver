@@ -90,8 +90,7 @@ def debugger():
     ])
     selection["action"]()
 
-def print_pdf():
-    print_title("Print PDF file")
+def print_pdf(pdf_list_limit=5):
     def dir_to_option(file):
         return {
             "title": file["name"],
@@ -103,16 +102,21 @@ def print_pdf():
         util.print_from_pdf(os.path.join(parent_dir, filename))
 
     try:
-        files = util.list_files_in_receipt_folder()
+        files = util.list_files_in_receipt_folder(pdf_list_limit)
         parent_dir = util.get_receipt_directory()
+        print_title(f"Print PDF file in {parent_dir}")
         manual_option = {
             "title": "***PRINT MANUALY***",
             "action": print_manually
         }
+        list_all_files = {
+            "title": "***SHOW MORE FILES***",
+            "action": lambda: print_pdf(50)
+        }
         dir_options = [dir_to_option(file) for file in files]
         selection = prompt_selection(
-            f"Select File to print from {parent_dir}", 
-            [ *dir_options, manual_option ]
+            f"Enter option#", 
+            [ *dir_options, list_all_files, manual_option ]
         )
         selection["action"]()
     except Exception as error:
