@@ -158,6 +158,29 @@ def test_receipt():
 def receipt_settings():
     print_title("Receipt Settings")
     
+    def remove_payment_method():
+        print_title("Remove payment method")
+
+        code_selection = prompt_selection("Select payment category", [
+            { "title": "Cash (P)", "value": config.K_CASH_CODE },
+            { "title": "Cheque (c)", "value": config.K_CHEQUE_CODE },
+            { "title": "Credit (N)", "value": config.K_CREDIT_CODE}
+        ])
+        
+        if code_selection:             
+            p_types = [*util.list_payment_methods_by_type(code_selection["value"])]
+            if len(p_types) <= 1:
+                print_error("You should have atleast one payment method type!!!")
+                return
+            payment_selection = prompt_selection("Select payment method", 
+                [{ "title": file } for file in p_types]                                     
+            )
+            
+            updated_list = [file for file in p_types if payment_selection["title"] != file]
+            util.update_payment_method(code_selection["value"], updated_list)
+        else:
+            print_error("Invalid selection")
+
     def add_payment_method():
         print_title("Add new payment method")
         code_selection = prompt_selection("Select payment category", [
@@ -165,13 +188,9 @@ def receipt_settings():
             { "title": "Cheque (c)", "value": config.K_CHEQUE_CODE },
             { "title": "Credit (N)", "value": config.K_CREDIT_CODE}
         ])
-        
-        print(code_selection["value"])
-        
+    
         payment_method_name = prompt_free_text("Payment method name")
-        
-        print(payment_method_name)
-        
+    
         if payment_method_name and code_selection:
             p_types = [*util.list_payment_methods_by_type(code_selection["value"])]
             p_types.append(payment_method_name)
@@ -241,6 +260,7 @@ def receipt_settings():
       { "title": "Archive Receipts After Printing", "action": set_receipt_archiving },
       { "title": "Supported payment methods", "action": show_payment_methods },
       { "title": "Add payment method", "action": add_payment_method },
+      { "title": "Remove payment method", "action": remove_payment_method },
       { "title": "Main Menu", "action": lambda: print("") }
     ])
     try:
