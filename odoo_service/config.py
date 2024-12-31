@@ -93,9 +93,9 @@ DEFAULT_CONFIG = {
             K_PRODUCT_TERMINATION: P_QUANTITY_AND_PRICE,
             K_PRODUCT: {
                 K_PRODUCT_NAME: f"^(?!{P_ODOO_WATER_MARK}|Discount\s*(\d*%,\s*Tax:\s*\d*%)|{P_PRODUCT_CODE}|{P_QUANTITY_AND_PRICE}|{P_MONEY}|{P_DATE}|{P_TIME}|{P_URL}|Line\s*Discount\s*\w*)(?P<{TYPE_MULTI_LINE_STR}>.*)",
-                K_TAX_CODE: f"{P_QUANTITY_AND_PRICE}\\s*{P_MONEY}\\s*(?P<{TYPE_STR}>[ABE]{{1}})",
-                K_QUANTITY: f"(?P<{TYPE_INT}>\d*)\s*x\s*(?:{P_MONEY})",
-                K_PRICE: f"\d*\s*x\s*(?P<{TYPE_FLOAT}>{P_MONEY})",
+                K_TAX_CODE: f"{P_QUANTITY_AND_PRICE}\\s*{P_MONEY}\\s*(?P<{TYPE_STR}>[ABE]{{1}})$",
+                K_QUANTITY: f"^(?P<{TYPE_INT}>\d*)\s*x\s*(?:{P_MONEY})\s*{P_MONEY}[ABE]{{1}}$",
+                K_PRICE: f"^\d*\s*x\s*(?P<{TYPE_FLOAT}>{P_MONEY})\s*{P_MONEY}[ABE]{{1}}$",
                 K_TOTAL_BEFORE_DISCOUNT: f"^(?P<{TYPE_FLOAT}>{P_MONEY})$",
                 K_DISCOUNT: f"Line\s*Discount:\s*(?P<{TYPE_FLOAT}>\d+)"
             }
