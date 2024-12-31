@@ -157,6 +157,16 @@ def test_receipt():
 
 def receipt_settings():
     print_title("Receipt Settings")
+    def show_payment_methods():
+        print_title("Supported payment methods")
+        methods = util.list_payment_methods()
+        for method in methods:
+            print("")
+            print(f"{method["cat"]} {method["code"]}")
+            for val in method["values"]:
+                print("")
+                print(f"==> {val}")
+        
     def set_error_receipts():
         print_title("Print Errors")
         selection = prompt_selection("Do you want to print error receipts?", [
@@ -207,6 +217,7 @@ def receipt_settings():
       { "title": "Receipt Folder", "action": set_receipt_folder },
       { "title": "Validate Sales Date", "action": set_date_validation },
       { "title": "Archive Receipts After Printing", "action": set_receipt_archiving },
+      { "title": "Supported payment methods", "action": show_payment_methods },
       { "title": "Main Menu", "action": lambda: print("") }
     ])
     try:

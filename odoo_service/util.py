@@ -10,6 +10,7 @@ from datetime import datetime
 import receipt
 import os
 import platform
+import re
 
 def is_admin():
     if platform.system() == "Windows":
@@ -143,6 +144,23 @@ def list_files_in_receipt_folder(limit=10):
     directory = Path(get_receipt_directory())
     items = [file_to_object(file) for file in directory.iterdir() if is_valid(file)]
     return sorted(items, key=lambda f: f["modified"], reverse=True)[:limit]
+
+def extract_payment_methods_from_regex_string(regex_string):
+    return re.search(r"\(?:([^)]+)\)", regex_string).group(1).split('|')
+
+def list_payment_methods():
+    p_types = config.get_config(config.K_RECEIPT)[config.K_META][config.K_PAYMENT_MODES]
+    code_map = {
+        config.K_CASH_CODE: "Cash Payment Category",
+        config.K_CHEQUE_CODE: "Cheque Payment Category",
+        config.K_CREDIT_CODE: "Credit Payment Category"
+    }
+    methods = []
+    for code, value in p_types.items():
+        val = extract_payment_methods_from_regex_string(value)
+        if val:
+            methods.append({"cat": code_map[code], "code": code, "values": val})        
+    return methods
 
 def print_archived(order_number):
     try:

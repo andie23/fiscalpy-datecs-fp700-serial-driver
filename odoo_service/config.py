@@ -80,9 +80,9 @@ DEFAULT_CONFIG = {
             K_TOTAL_QUANTITY: f"Total\s*Product\s*Qty\s*(?P<{TYPE_INT}>\d*)",
             K_TOTAL_PRODUCTS: f"Total\s*No.\s*of\s*Products\s*(?P<{TYPE_INT}>\d*)",
             K_PAYMENT_MODES: {
-                K_CASH_CODE: f"^Cash\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})",
+                K_CASH_CODE: f"^(?:Cash)\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})",
                 K_CREDIT_CODE: f"^(?:Credit\s*Card|Bank)\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})",
-                K_CHEQUE_CODE: f"^Cheque\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})"
+                K_CHEQUE_CODE: f"^(?:Cheque)\s*(?P<{TYPE_MULTI_LINE_FLOAT}>{P_MONEY})"
             },
             K_ORDER_NUMBER: fr"^Order\s*Ref:\w*\s*Order\s*(?P<{TYPE_STR}>\d{{5}}-\d{{3}}-\d{{4}})",
             K_DATE: f"^(?P<{TYPE_DATE}>{P_DATE})\s*(?:{P_TIME})$"
