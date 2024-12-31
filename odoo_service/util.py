@@ -125,6 +125,21 @@ def get_receipt_directory():
         raise NameError(f"Target directory {target_dir} does not exist!")
     return target_dir
 
+def list_files_in_receipt_folder(limit=10):
+    def is_valid(pdf_file):
+        return pdf_file.is_file() and pdf_file.suffix == '.pdf'
+
+    def file_to_object(pdf_file):
+        return {
+            "name": pdf_file.name,
+            "path": str(pdf_file.resolve()),
+            "modified": str(pdf_file.stat().st_mtime)
+        }
+
+    directory = Path(get_receipt_directory())
+    items = [file_to_object(file) for file in directory.iterdir() if is_valid(file)]
+    return sorted(items, key=lambda f: f["modified"], reverse=True)[:limit]
+
 def print_archived(order_number):
     try:
         directory = Path(config.RECEIVED_RECEIPTS)

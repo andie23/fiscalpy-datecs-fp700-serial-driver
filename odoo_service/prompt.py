@@ -52,11 +52,29 @@ def reprint_order():
 
 def print_pdf():
     print_title("Print PDF file")
-    try:
-        parent_dir = util.get_receipt_directory()
-        print(f"Receipt Folder {parent_dir}")
+    def dir_to_option(file):
+        return {
+            "title": file["name"],
+            "action": lambda: util.print_from_pdf(file["path"])
+        }
+
+    def print_manually():
         filename = prompt_free_text("Please specify Filename")
         util.print_from_pdf(os.path.join(parent_dir, filename))
+
+    try:
+        files = util.list_files_in_receipt_folder()
+        parent_dir = util.get_receipt_directory()
+        manual_option = {
+            "title": "***PRINT MANUALY***",
+            "action": print_manually
+        }
+        dir_options = [dir_to_option(file) for file in files]
+        selection = prompt_selection(
+            f"Select File to print from {parent_dir}", 
+            [ *dir_options, manual_option ]
+        )
+        selection["action"]()
     except Exception as error:
         log.error(error)
 
