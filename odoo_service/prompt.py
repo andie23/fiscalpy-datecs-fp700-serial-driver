@@ -50,6 +50,46 @@ def reprint_order():
     else:
         print_error(f"Order {order_number} not found")
 
+def debugger():    
+    print_title("Debugger")
+    def read_receipt_text():
+        print_title("Read PDF receipt Text")
+        def dir_to_option(file):
+            return {
+                "action": lambda: print(util.pdf_to_text(file["path"])),
+                "title": file["name"]
+            }
+        parent_dir = util.get_receipt_directory()
+        files = util.list_files_in_receipt_folder()
+        dir_options = [dir_to_option(file) for file in files]
+        selection = prompt_selection(
+            f"Select File to read text from {parent_dir}", 
+            dir_options
+        )
+        selection["action"]()
+    
+    def read_receipt_dictionary():
+        print_title("Read PDF receipt JSON")
+        def dir_to_option(file):
+            return {
+                "action": lambda: print(util.pdf_path_to_doc(file["path"])),
+                "title": file["name"]
+            }
+        parent_dir = util.get_receipt_directory()
+        files = util.list_files_in_receipt_folder()
+        dir_options = [dir_to_option(file) for file in files]
+        selection = prompt_selection(
+            f"Select File to read JSON from {parent_dir}", 
+            dir_options
+        )
+        selection["action"]()
+    
+    selection = prompt_selection("Select option to debugg", [
+        { "title": "Read PDF receipt text", "action": read_receipt_text },        
+        { "title": "Read PDF receipt metadata", "action": read_receipt_dictionary },
+    ])
+    selection["action"]()
+
 def print_pdf():
     print_title("Print PDF file")
     def dir_to_option(file):
@@ -255,7 +295,8 @@ def main():
         { "title": "Print a PDF Receipt File", "action": print_pdf },
         { "title": "Verify printer is connected", "action": test_receipt },
         { "title": "Printer Settings", "action": printer_settings },
-        { "title": "Receipt Settings", "action": receipt_settings }
+        { "title": "Receipt Settings", "action": receipt_settings },
+        { "title": "Debugger", "action": debugger }
     ])
     try:
         selection["action"]()

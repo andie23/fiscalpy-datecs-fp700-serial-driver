@@ -60,6 +60,10 @@ def pdf_to_text(pdf_path):
             text += page_text + "\n"
     return text
 
+def pdf_path_to_doc(pdf_path):
+    txt = pdf_to_text(pdf_path)
+    return receipt.parse(txt)
+
 def is_today(date_str):
     given_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     current_date = datetime.now().date()
