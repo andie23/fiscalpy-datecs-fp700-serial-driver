@@ -15,6 +15,7 @@ class ReceiptHandler(PatternMatchingEventHandler):
             return
         self.last_modified = event.src_path
         try:
+            time.sleep(0.8)
             util.print_from_pdf(event.src_path)
         except Exception as error:
             log.error(f"General error: {error}")
