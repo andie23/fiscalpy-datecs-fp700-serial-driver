@@ -51,7 +51,7 @@ def reprint_order():
         print_error(f"Order {order_number} not found")
 
 def debugger():    
-    print_title("Debugger")
+    print_title("View Receipt")
     def read_receipt_text():
         print_title("Read PDF receipt Text")
         def dir_to_option(file):
@@ -84,7 +84,7 @@ def debugger():
         )
         selection["action"]()
     
-    selection = prompt_selection("Select option to debugg", [
+    selection = prompt_selection("Select option", [
         { "title": "Read PDF receipt text", "action": read_receipt_text },        
         { "title": "Read PDF receipt metadata", "action": read_receipt_dictionary },
     ])
@@ -354,7 +354,7 @@ def main():
         { "title": "Verify printer is connected", "action": test_receipt },
         { "title": "Printer Settings", "action": printer_settings },
         { "title": "Receipt Settings", "action": receipt_settings },
-        { "title": "Debugger", "action": debugger }
+        { "title": "View receipt", "action": debugger }
     ])
     try:
         selection["action"]()
