@@ -8,14 +8,10 @@ import version
 class ReceiptHandler(PatternMatchingEventHandler):
     def __init__(self):
         super().__init__(patterns=["*.pdf"], ignore_directories=True)
-        self.last_modified = ""
 
     def on_modified(self, event):
-        if self.last_modified == event.src_path:
-            return
-        self.last_modified = event.src_path
         try:
-            time.sleep(0.8)
+            time.sleep(1)
             util.print_from_pdf(event.src_path)
         except Exception as error:
             log.error(f"General error: {error}")
