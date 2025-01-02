@@ -2,7 +2,7 @@ import os
 import json
 
 # Change this value if you want to override existing configuration file
-CURRENT_REVISION_NUMBER = 1
+CURRENT_REVISION_NUMBER = 2
 
 CONFIG_FILE = "odoo.config.json"
 RECEIVED_RECEIPTS = "Received Receipts"
