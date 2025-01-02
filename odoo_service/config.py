@@ -12,8 +12,8 @@ P_ODOO_WATER_MARK = "Odoo POS\s+\d{2}/\d{2}/\d{2},\s+\d{2}:\d{2}\s*(AM|PM)"
 P_MONEY = "(([1-9]\\d{0,2}(,\\d{3})*)|0)?\\.\\d{2}"
 P_DATE = "\\d{4}-\\d{2}-\\d{2}|\\d{2}/\\d{2}/\\d{4}"
 P_TIME = "\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}|\\d{2}:\\d{2}:\\d{2}"
-P_PRODUCT_PRICING_LINE = f"\d\s*x\s*{P_MONEY}\s*{P_MONEY}\s*{P_TAX_CODE}"
-P_QUANTITY_AND_PRICE = f"(\d*)\s*x\s*({P_MONEY})"
+P_PRODUCT_PRICING_LINE = f"\d+\s+x\s+{P_MONEY}\s+{P_MONEY}\s*{P_TAX_CODE}"
+P_QUANTITY_AND_PRICE = f"(\d+)\s+x\s+({P_MONEY})"
 P_URL = "((?:[a-zA-Z][a-zA-Z0-9+.-]*):\/\/[^\s/$.?#].[^\s]*)"
 P_PRODUCT_CODE = "\\[(\\w*)\\]"
 K_TOTAL_AMOUNT = "total_amount"
@@ -100,9 +100,9 @@ DEFAULT_CONFIG = {
             K_PRODUCT_TERMINATION: f"^{P_PRODUCT_PRICING_LINE}$",
             K_PRODUCT: {
                 K_PRODUCT_NAME: f"^(?!{P_ODOO_WATER_MARK}|Discount\s*(\d*%,\s*Tax:\s*\d*%)|{P_PRODUCT_CODE}|{P_PRODUCT_PRICING_LINE}|{P_MONEY}|{P_DATE}|{P_TIME}|{P_URL}|Line\s*Discount\s*\w*)(?P<{TYPE_MULTI_LINE_STR}>.*)",
-                K_TAX_CODE: f"{P_QUANTITY_AND_PRICE}\s*{P_MONEY}\s*(?P<{TYPE_STR}>{P_TAX_CODE})$",
-                K_QUANTITY: f"^(?P<{TYPE_INT}>\d)\s*x\s*{P_MONEY}\s*{P_MONEY}\s*{P_TAX_CODE}$",
-                K_PRICE: f"^\d\s*x\s*(?P<{TYPE_FLOAT}>{P_MONEY})\s*{P_MONEY}\s*{P_TAX_CODE}$",
+                K_TAX_CODE: f"{P_QUANTITY_AND_PRICE}\s+{P_MONEY}\s*(?P<{TYPE_STR}>{P_TAX_CODE})$",
+                K_QUANTITY: f"^(?P<{TYPE_INT}>\d+)\s+x\s+{P_MONEY}\s+{P_MONEY}\s*{P_TAX_CODE}$",
+                K_PRICE: f"^\d+\s+x\s+(?P<{TYPE_FLOAT}>{P_MONEY})\s+{P_MONEY}\s*{P_TAX_CODE}$",
                 K_TOTAL_BEFORE_DISCOUNT: f"^(?P<{TYPE_FLOAT}>{P_MONEY})$",
                 K_DISCOUNT: f"Line\s*Discount:\s*(?P<{TYPE_FLOAT}>\d+)"
             }
