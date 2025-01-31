@@ -1,7 +1,8 @@
 const NATIVE_PORT = 'com.fiscalpy.fp700'
 
 const ACTION_WHITE_LIST = [ 
-    'print-receipt'
+    'print-receipt',
+    'play-sound'
 ]
 
 chrome.runtime.onMessage.addListener((message, sender) => {

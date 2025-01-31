@@ -8,17 +8,45 @@ const paymentKeySelect = document.getElementById("paymentKey");
 const paymentNameInput = document.getElementById("paymentName");
 const addPaymentButton = document.getElementById("addPayment");
 const paymentList = document.getElementById("paymentList");
+const baudRateSelect = document.getElementById("baudrate")
+const portSelect = document.getElementById("port")
+const testPrinterButton = document.getElementById("testPrinter")
 
 // Load saved settings
-chrome.storage.local.get([LOCAL_STORAGE_CAN_PRINT_ONLOAD, LOCAL_STORAGE_PAYMENT_FISCALPY, LOCAL_STORAGE_PRINT_COPY], (data) => {
+chrome.storage.local.get(['port', 'baudrate', LOCAL_STORAGE_CAN_PRINT_ONLOAD, LOCAL_STORAGE_PAYMENT_FISCALPY, LOCAL_STORAGE_PRINT_COPY], (data) => {
     printCopiesToggle.checked = data[LOCAL_STORAGE_PRINT_COPY] || false;
     printOnLoadToggle.checked = data[LOCAL_STORAGE_CAN_PRINT_ONLOAD] || false;
+    portSelect.value = data.port
+    baudRateSelect.value = data.baudrate
+
     if (data[LOCAL_STORAGE_PAYMENT_FISCALPY]) {
         for (const [key, name] of Object.entries(data[LOCAL_STORAGE_PAYMENT_FISCALPY])) {
             addPaymentToList(key, name);
         }
     }
 });
+
+baudRateSelect.addEventListener("change", (event) => {
+    chrome.storage.local.set({ baudrate: event.target.value })
+})
+
+portSelect.addEventListener("change", (event) => {
+    chrome.storage.local.set({ port: event.target.value })
+})
+
+testPrinterButton.addEventListener("click", () => {
+    chrome.storage.local.get(['port', 'baudrate'], (data) => {
+        alert("Please listen to the printer for any sounds")
+        chrome.runtime.sendMessage({
+            action: 'play-sound',
+            playCount: 4,
+            printer_config: {
+                port: data.port,
+                baudrate: data.baudrate
+            }
+        })
+    })
+})
 
 // Save print copies toggle
 printCopiesToggle.addEventListener("change", () => {

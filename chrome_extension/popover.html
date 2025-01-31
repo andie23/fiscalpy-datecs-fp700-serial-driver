@@ -105,10 +105,47 @@
     </style>
 </head>
 <body>
-
     <h1>Fiscalpy</h1>
     <h3>🖨️ Printer Settings</h3>
+    <div>
+        <div style="display: flex; gap: 20px;">
+            <div>
+                <select id="port">
+                    <option>Port</option>
+                    <option value="COM1">COM 1</option>
+                    <option value="COM2">COM 2</option>
+                    <option value="COM3">COM 3</option>
+                    <option value="COM4">COM 4</option>
+                    <option value="COM5">COM 5</option>
+                    <option value="COM6">COM 6</option>
+                    <option value="COM7">COM 7</option>
+                    <option value="COM8">COM 8</option>
+                    <option value="COM9">COM 9</option>
+                </select>
+            </div>
+            <div>
+                <select id="baudrate">
+                    <option>Baudrate</option>
+                    <option value="300">300</option>
+                    <option value="600">600</option>
+                    <option value="1200">1200</option>
+                    <option value="2400">2400</option>
+                    <option value="4800">4800</option>
+                    <option value="9600">9600</option>
+                    <option value="14400">14400</option>
+                    <option value="19200">19200</option>
+                    <option value="38400">38400</option>
+                    <option value="57600">57600</option>
+                    <option value="115200">115200</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <button id="testPrinter">Test printer!</button>
+        </div>
+    </div>
 
+    <h3>📄 Receipt Settings</h3>
     <div class="toggle-container">
         <span>Print Copies</span>
         <label class="toggle-switch">
