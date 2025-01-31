@@ -5,6 +5,7 @@ import device
 import version
 import protocol_cmd as cmd
 import sys, struct
+
 printer = device.DeviceService()
 
 def print_fiscal_receipt(receipt_data):
@@ -88,14 +89,19 @@ def write_message(data):
 def execute_from_message(message):
     if not message.get('action', False) or not isinstance(message['action'], str):
         return write_message({ "ok": False, "error": "Invalid message action. Expected string but got something else" })
-    
+
+    if message['action'] == 'hello':
+        write_message({ "ok": True, "message": "Hello, I'm Fiscalpy!" })
+
     if message['action'] == 'print-receipt':
-        print_fiscal_receipt(message['receipt'])
-        write_message({ "ok": True })
+        if print_fiscal_receipt(message['receipt']):
+            write_message({ "ok": True })
+        else:
+            write_message({ "ok": False, "error": "An error occured while communicating with printing device!" })
 
     if message['action'] == 'active-ports':
         write_message({ "ok": True, "active-ports": printer.get_active_ports() })
-        
+
     if message['action'] == 'port-config':
         if 'port' in message:
             config.update("Port", message['port'])
@@ -119,9 +125,8 @@ def execute_from_message(message):
         write_message({ "ok": True, "version-info": f"Fiscalpy {version.SYSTEM_VERSION}" })
 
 if __name__ == '__main__':
-    message = read_message()
     try:
+        message = read_message()
         execute_from_message(message)
     except Exception as e:
         write_message({ "ok": False, "error": f"An error has occured!: {e}" })
-    
