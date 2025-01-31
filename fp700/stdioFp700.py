@@ -11,9 +11,9 @@ printer = device.DeviceService()
 def print_fiscal_receipt(receipt_data):
     receipt_commands = [
         cmd.b_open_fiscal_receipt(
-            code=receipt_data.get('operator_code', config.get_config(config.K_OPERATOR_CODE)),
-            password=receipt_data.get('operator_password', config.get_config(config.K_OPERATOR_PASSWORD)),
-            till=receipt_data.get('till_number', config.get_config(config.K_TILL)),
+            code=config.get_config(config.K_OPERATOR_CODE),
+            password=config.get_config(config.K_OPERATOR_PASSWORD),
+            till=config.get_config(config.K_TILL),
             buyer=receipt_data.get("buyer", ""),
             buyer_tin=receipt_data.get("buyer_tin", "")
         )
@@ -87,48 +87,43 @@ def write_message(data):
 
 
 def execute_from_message(message):
-    if not message.get('action', False) or not isinstance(message['action'], str):
-        return write_message({ "ok": False, "error": "Invalid message action. Expected string but got something else" })
+    if not isinstance(message, dict):
+        return write_message({ "ok": False, "error": "Error connecting to Fp700 App." })
 
+    action = message.get('action', 'play-sound')
+    
     if 'printer_config' in message:
-        baudrate = message['printer_config'].get('baudrate', config.get_config(config.K_BAUDRATE))
-        port = message['printer_config'].get('port', config.get_config(config.K_PORT)) 
-
+        conf = message['printer_config']
+        baudrate = conf.get('baudrate', config.get_config(config.K_BAUDRATE))
+        port = conf.get('port', config.get_config(config.K_PORT)) 
+        code = conf.get('operator_code', config.get_config(config.K_OPERATOR_CODE))
+        password = conf.get('operator_password', config.get_config(config.K_OPERATOR_PASSWORD))
+        till = conf.get('till_number', config.get_config(config.K_TILL))
+        
+        config.update(config.K_OPERATOR_CODE, code)
+        config.update(config.K_OPERATOR_PASSWORD, password)
+        config.update(config.K_TILL, till)
         config.update(config.K_BAUDRATE, baudrate)
         config.update(config.K_PORT, port)
 
-    if message['action'] == 'hello':
+    if action == 'hello':
         write_message({ "ok": True, "message": "Hello, I'm Fiscalpy!" })
 
-    if message['action'] == 'print-receipt':
+    if action == 'print-receipt':
         if print_fiscal_receipt(message['receipt']):
             write_message({ "ok": True })
         else:
             write_message({ "ok": False, "error": "Connection Error to printer. Please check printer settings" })
 
-    if message['action'] == 'active-ports':
-        write_message({ "ok": True, "active-ports": printer.get_active_ports() })
-
-    if message['action'] == 'port-config':
-        if 'port' in message:
-            config.update("Port", message['port'])
-
-        if 'baudrate' in message:
-            config.update("Baudrate", message['baudrate'])
-        write_message({ "ok": True })
-
-    if message['action'] == 'reset-config':
+    if action == 'reset-config':
         config.reset()
         write_message({ "ok": True })
 
-    if message['action'] == 'play-sound':
-        if 'beepCount' in message:
-            beep_printer(message['beepCount'])
-        else:
-            beep_printer(1)
+    if action == 'play-sound':
+        beep_printer(message.get('playCount', 1))
         write_message({ "ok": True })
 
-    if message['action'] == 'version-info':
+    if action == 'version-info':
         write_message({ "ok": True, "version-info": f"Fiscalpy {version.SYSTEM_VERSION}" })
 
 if __name__ == '__main__':
