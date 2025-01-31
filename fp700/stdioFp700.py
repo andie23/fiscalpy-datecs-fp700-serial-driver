@@ -90,6 +90,13 @@ def execute_from_message(message):
     if not message.get('action', False) or not isinstance(message['action'], str):
         return write_message({ "ok": False, "error": "Invalid message action. Expected string but got something else" })
 
+    if 'printer_config' in message:
+        baudrate = message['printer_config'].get('baudrate', config.get_config(config.K_BAUDRATE))
+        port = message['printer_config'].get('port', config.get_config(config.K_PORT)) 
+
+        config.update(config.K_BAUDRATE, baudrate)
+        config.update(config.K_PORT, port)
+
     if message['action'] == 'hello':
         write_message({ "ok": True, "message": "Hello, I'm Fiscalpy!" })
 
@@ -97,7 +104,7 @@ def execute_from_message(message):
         if print_fiscal_receipt(message['receipt']):
             write_message({ "ok": True })
         else:
-            write_message({ "ok": False, "error": "An error occured while communicating with printing device!" })
+            write_message({ "ok": False, "error": "Connection Error to printer. Please check printer settings" })
 
     if message['action'] == 'active-ports':
         write_message({ "ok": True, "active-ports": printer.get_active_ports() })
