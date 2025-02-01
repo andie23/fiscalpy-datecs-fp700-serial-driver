@@ -205,7 +205,14 @@ function updateOrderNumber(orderNumber) {
 }
 
 async function getPaymentModes() {
-    return (await chrome.storage.local.get([K_PAYMENT_TYPES]))?.[K_PAYMENT_TYPES] ?? { "Cash": "P" }
+    return chrome.storage.local
+        .get([K_PAYMENT_TYPES])
+        .then((conf) => {
+            if (conf[K_PAYMENT_TYPES]) {
+                return conf[K_PAYMENT_TYPES]
+            }
+            return { Cash: "P" }
+        })
 }
 
 function init(node) {

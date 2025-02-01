@@ -1,9 +1,9 @@
 {
     "name": "com.fiscalpy.fp700",
     "description": "Native messaging host for Fp700 printer",
-    "path": "/home/andrew-dev/Projects/fiscalpy-platform/fp700/stdioFp700.py",
+    "path": "C:\\ProgramData\\Fiscalpy\\stdioFp700.exe",
     "type": "stdio",
     "allowed_origins": [
-        "chrome-extension://gnhchnfinbhpnjnglogmioidepefclhn/"
+        "chrome-extension://gonmilajdmokbflkilnnhjinffoplpem/"
     ]
 }

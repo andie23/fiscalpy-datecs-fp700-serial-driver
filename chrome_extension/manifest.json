@@ -1,0 +1,36 @@
+{
+    "name": "Fiscalpy For Odoo",
+    "manifest_version": 3,
+    "version": "1.0",
+    "description": "Reads Odoo POS Receipts and sends them to fiscal receipt",
+    "permissions": [
+        "activeTab", 
+        "scripting", 
+        "nativeMessaging",
+        "storage"
+    ],
+    "host_permissions": ["file:///C:/Users/Andrew/Downloads/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["file:///C:/Users/Andrew/Downloads/*"],
+            "js": ["content.js"]
+        }
+    ],
+    "icons": {
+        "16": "icons/icon_16x16.png",
+        "48": "icons/icon_48x48.png",
+        "128": "icons/icon_128x128.png"
+    },
+    "action": {
+        "default_popup": "popover.html",
+        "default_title": "Fiscalpy",
+        "default_icon": {
+            "16": "icons/icon_16x16.png",
+            "48": "icons/icon_48x48.png",
+            "128": "icons/icon_128x128.png"
+        }
+    }
+}
