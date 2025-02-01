@@ -7,6 +7,8 @@ const K_PRINT_COPY = 'printCopy'
 const LOCAL_STORAGE_PRINTED_ORDER_NUMBERS = 'com.fiscalpy.odoo.extension.printed_order_numbers'
 const K_PORT = 'port'
 const K_BAUDRATE = 'baudrate'
+const K_ORDER_NUMBERS = 'savedOrderNumbers'
+
 /**
  * Listen for messages from the background script
  */
@@ -184,15 +186,23 @@ async function parseReceipt(node) {
     }
 }
 
-function isOrderNumberPrinted(orderNumber) {
-    const orderNumbers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PRINTED_ORDER_NUMBERS) ?? '[]')
-    return orderNumbers && orderNumbers.includes(orderNumber)
+function orderNumberAlreadyProcessed(orderNumber) {
+    return chrome.storage.local
+        .get([K_ORDER_NUMBERS])
+        .then((conf) => (conf?.[K_ORDER_NUMBERS]??[]).includes(orderNumber))
+        .catch((e) => {
+            console.error(e)
+            return false
+        })
 }
 
 function updateOrderNumber(orderNumber) {
-    const orderNumbers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PRINTED_ORDER_NUMBERS) ?? '[]')
-    orderNumbers.push(orderNumber)
-    localStorage.setItem(LOCAL_STORAGE_PRINTED_ORDER_NUMBERS, JSON.stringify(orderNumbers))
+    chrome.storage.local.get([K_ORDER_NUMBERS], (conf) => {
+        const orderNumbers = conf[K_ORDER_NUMBERS] ?? []
+        if (!orderNumbers.includes(orderNumber)) {
+            chrome.storage.local.set({ [K_ORDER_NUMBERS]: [...orderNumbers, orderNumber] })
+        }
+    })
 }
 
 async function getPaymentModes() {
@@ -211,8 +221,9 @@ function init(node) {
             !confirm('The receipt date is not today. Are you sure you want to print?')) {
             return
         }
-        if (isOrderNumberPrinted(receipt.receiptData.order_number)) {
-            if (!confirm(`Order number ${receipt.receiptData.order_number} was already processed. YOU MAY INCUR DOUBLE TAXATION IF YOU PRINT AGAIN...`)) {
+        const orderNumber = receipt.receiptData.order_number
+        if ((await orderNumberAlreadyProcessed(orderNumber))) {
+            if (!confirm(`Order number ${orderNumber} was already processed. YOU MAY INCUR DOUBLE TAXATION IF YOU PRINT AGAIN...`)) {
                 return
             }
         }
