@@ -37,17 +37,7 @@ portSelect.addEventListener("change", (event) => {
 })
 
 testPrinterButton.addEventListener("click", () => {
-    chrome.storage.local.get([K_PORT, K_BAUDRATE], (data) => {
-        alert("Please listen to the printer for any sounds")
-        chrome.runtime.sendMessage({
-            action: 'play-sound',
-            playCount: 4,
-            printer_config: {
-                port: data?.[K_PORT],
-                baudrate: data?.[K_BAUDRATE]
-            }
-        })
-    })
+    chrome.runtime.sendMessage({ action: 'play-sound', playCount: 4 })
 })
 
 // Save print copies toggle

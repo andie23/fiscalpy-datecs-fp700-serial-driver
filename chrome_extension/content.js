@@ -5,7 +5,8 @@ const K_PAYMENT_TYPES = 'paymentTypes'
 const K_PRINT_ON_LOAD = 'printOnload'
 const K_PRINT_COPY = 'printCopy'
 const LOCAL_STORAGE_PRINTED_ORDER_NUMBERS = 'com.fiscalpy.odoo.extension.printed_order_numbers'
-
+const K_PORT = 'port'
+const K_BAUDRATE = 'baudrate'
 /**
  * Listen for messages from the background script
  */
@@ -200,7 +201,6 @@ async function getPaymentModes() {
 
 function init(node) {
     const sendPrintMessage = async () => {
-        const settings = await chrome.storage.local.get([K_PORT, K_BAUDRATE])
         const receipt = await parseReceipt(node)
         console.log(receipt)
         if (receipt.errors.length > 0) {
@@ -216,14 +216,7 @@ function init(node) {
                 return
             }
         }
-        chrome.runtime.sendMessage({ 
-            printer_config: {
-                port: settings?.[K_PORT],
-                baudrate: settings?.[K_BAUDRATE]
-            },
-            receipt: receipt.receiptData, 
-            action: "print-receipt" 
-        })
+        chrome.runtime.sendMessage({ receipt: receipt.receiptData, action: "print-receipt"})
     }
 
     chrome.storage.local.get([K_PRINT_ON_LOAD]).then((data) => { 

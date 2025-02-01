@@ -23,5 +23,15 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     });
 
     console.log('Sending message to port')
-    port.postMessage(message)
+    chrome.storage.local.get(['port', 'baudrate'], (conf) => {
+        const payload = {
+            printer_config: {
+                port: conf?.port,
+                baudrate: conf?.baudrate ? Number(conf.baudrate) : undefined
+            },
+            ...message
+        }
+        console.log("Sending payload ", payload)
+        port.postMessage(payload)
+    })
 })
