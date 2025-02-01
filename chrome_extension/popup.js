@@ -37,6 +37,8 @@ portSelect.addEventListener("change", (event) => {
 })
 
 testPrinterButton.addEventListener("click", () => {
+    alert("Listen, The fiscal Printer will beep 4 times. Please confirm")
+
     chrome.runtime.sendMessage({ action: 'play-sound', playCount: 4 })
 })
 
