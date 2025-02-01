@@ -1,9 +1,9 @@
 const RECEIPT_SCREEN_CLASS = 'pos-receipt'
 const FISCALPY_PRINT_UI_ID = 'fiscalpy-print-ui'
 const FISCALPY_PRINT_BTN_ID = 'fiscalpy-print-btn'
-const LOCAL_STORAGE_PAYMENT_FISCALPY = 'paymentTypes'
-const LOCAL_STORAGE_CAN_PRINT_ONLOAD = 'printOnload'
-const LOCAL_STORAGE_PRINT_COPY = 'printCopy'
+const K_PAYMENT_TYPES = 'paymentTypes'
+const K_PRINT_ON_LOAD = 'printOnload'
+const K_PRINT_COPY = 'printCopy'
 const LOCAL_STORAGE_PRINTED_ORDER_NUMBERS = 'com.fiscalpy.odoo.extension.printed_order_numbers'
 
 /**
@@ -79,7 +79,7 @@ function extractInt(text, pattern, defaultValue=0, index=1) {
 // Parse the receipt screen and extract the necessary data
 async function parseReceipt(node) {
     const paymentTypes = await getPaymentModes();
-    const canPrintCopy = (await chrome.storage.local.get(LOCAL_STORAGE_PRINT_COPY))?.[LOCAL_STORAGE_PRINT_COPY] ?? false
+    const canPrintCopy = (await chrome.storage.local.get(K_PRINT_COPY))?.[K_PRINT_COPY] ?? false
     const receiptText = (node?.innerText ?? '').replace(/\s+/g, ' ')
     const contactSectionText = node.querySelector('.pos-receipt-contact')?.innerText ?? ''
     const receiptDate = node.querySelector('.pos-receipt-order-data')?.innerText ?? ''
@@ -195,11 +195,12 @@ function updateOrderNumber(orderNumber) {
 }
 
 async function getPaymentModes() {
-    return (await chrome.storage.local.get([LOCAL_STORAGE_PAYMENT_FISCALPY]))?.[LOCAL_STORAGE_PAYMENT_FISCALPY] ?? { "Cash": "P" }
+    return (await chrome.storage.local.get([K_PAYMENT_TYPES]))?.[K_PAYMENT_TYPES] ?? { "Cash": "P" }
 }
 
 function init(node) {
     const sendPrintMessage = async () => {
+        const settings = await chrome.storage.local.get([K_PORT, K_BAUDRATE])
         const receipt = await parseReceipt(node)
         console.log(receipt)
         if (receipt.errors.length > 0) {
@@ -215,11 +216,18 @@ function init(node) {
                 return
             }
         }
-        chrome.runtime.sendMessage({ receipt: receipt.receiptData, action: "print-receipt" })
+        chrome.runtime.sendMessage({ 
+            printer_config: {
+                port: settings?.[K_PORT],
+                baudrate: settings?.[K_BAUDRATE]
+            },
+            receipt: receipt.receiptData, 
+            action: "print-receipt" 
+        })
     }
 
-    chrome.storage.local.get([LOCAL_STORAGE_CAN_PRINT_ONLOAD]).then((data) => { 
-        if (data[LOCAL_STORAGE_CAN_PRINT_ONLOAD]) {
+    chrome.storage.local.get([K_PRINT_ON_LOAD]).then((data) => { 
+        if (data[K_PRINT_ON_LOAD]) {
             sendPrintMessage()
         }
     })

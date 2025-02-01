@@ -1,6 +1,8 @@
-const LOCAL_STORAGE_PAYMENT_FISCALPY = 'paymentTypes'
-const LOCAL_STORAGE_CAN_PRINT_ONLOAD = 'printOnload'
-const LOCAL_STORAGE_PRINT_COPY = 'printCopy'
+const K_PAYMENT_TYPES = 'paymentTypes'
+const K_PRINT_ON_LOAD = 'printOnload'
+const K_PRINT_COPY = 'printCopy'
+const K_PORT = 'port'
+const K_BAUDRATE = 'baudrate'
 
 const printCopiesToggle = document.getElementById("printCopies");
 const printOnLoadToggle = document.getElementById("printOnLoad");
@@ -13,36 +15,36 @@ const portSelect = document.getElementById("port")
 const testPrinterButton = document.getElementById("testPrinter")
 
 // Load saved settings
-chrome.storage.local.get(['port', 'baudrate', LOCAL_STORAGE_CAN_PRINT_ONLOAD, LOCAL_STORAGE_PAYMENT_FISCALPY, LOCAL_STORAGE_PRINT_COPY], (data) => {
-    printCopiesToggle.checked = data[LOCAL_STORAGE_PRINT_COPY] || false;
-    printOnLoadToggle.checked = data[LOCAL_STORAGE_CAN_PRINT_ONLOAD] || false;
+chrome.storage.local.get([K_PORT, K_BAUDRATE, K_PRINT_ON_LOAD, K_PAYMENT_TYPES, K_PRINT_COPY], (data) => {
+    printCopiesToggle.checked = data[K_PRINT_COPY] || false;
+    printOnLoadToggle.checked = data[K_PRINT_ON_LOAD] || false;
     portSelect.value = data.port
     baudRateSelect.value = data.baudrate
 
-    if (data[LOCAL_STORAGE_PAYMENT_FISCALPY]) {
-        for (const [key, name] of Object.entries(data[LOCAL_STORAGE_PAYMENT_FISCALPY])) {
+    if (data[K_PAYMENT_TYPES]) {
+        for (const [key, name] of Object.entries(data[K_PAYMENT_TYPES])) {
             addPaymentToList(key, name);
         }
     }
 });
 
 baudRateSelect.addEventListener("change", (event) => {
-    chrome.storage.local.set({ baudrate: event.target.value })
+    chrome.storage.local.set({ [K_BAUDRATE]: event.target.value })
 })
 
 portSelect.addEventListener("change", (event) => {
-    chrome.storage.local.set({ port: event.target.value })
+    chrome.storage.local.set({ [K_PORT]: event.target.value })
 })
 
 testPrinterButton.addEventListener("click", () => {
-    chrome.storage.local.get(['port', 'baudrate'], (data) => {
+    chrome.storage.local.get([K_PORT, K_BAUDRATE], (data) => {
         alert("Please listen to the printer for any sounds")
         chrome.runtime.sendMessage({
             action: 'play-sound',
             playCount: 4,
             printer_config: {
-                port: data.port,
-                baudrate: data.baudrate
+                port: data?.[K_PORT],
+                baudrate: data?.[K_BAUDRATE]
             }
         })
     })
@@ -50,12 +52,12 @@ testPrinterButton.addEventListener("click", () => {
 
 // Save print copies toggle
 printCopiesToggle.addEventListener("change", () => {
-    chrome.storage.local.set({ [LOCAL_STORAGE_PRINT_COPY]: printCopiesToggle.checked });
+    chrome.storage.local.set({ [K_PRINT_COPY]: printCopiesToggle.checked });
 });
 
 // Save print on load setting
 printOnLoadToggle.addEventListener("change", () => {
-    chrome.storage.local.set({ [LOCAL_STORAGE_CAN_PRINT_ONLOAD]: printOnLoadToggle.checked });
+    chrome.storage.local.set({ [K_PRINT_ON_LOAD]: printOnLoadToggle.checked });
 });
 
 // Add new payment method
@@ -65,13 +67,13 @@ addPaymentButton.addEventListener("click", () => {
 
     if (!name) return alert("Please enter payment type name");
 
-    chrome.storage.local.get([LOCAL_STORAGE_PAYMENT_FISCALPY], (data) => {
-        if (data?.[LOCAL_STORAGE_PAYMENT_FISCALPY]?.[name]) {
+    chrome.storage.local.get([K_PAYMENT_TYPES], (data) => {
+        if (data?.[K_PAYMENT_TYPES]?.[name]) {
             return alert("Key already exists");
         }
         chrome.storage.local.set({ 
-            [LOCAL_STORAGE_PAYMENT_FISCALPY]: {
-                ...data[LOCAL_STORAGE_PAYMENT_FISCALPY], [name]: key 
+            [K_PAYMENT_TYPES]: {
+                ...data[K_PAYMENT_TYPES], [name]: key 
             } 
         }).then(() => {
             addPaymentToList(key, name);
