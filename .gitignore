@@ -1,8 +1,10 @@
 *.pdf
-*.json
+fp700.config.json
+odoo.config.json
 *.txt
 *.spec
 dist/*
+odoo_service/Received Receipts/*
 fp700/dist/*
 odoo_service/build/*
 odoo_service/dist/*

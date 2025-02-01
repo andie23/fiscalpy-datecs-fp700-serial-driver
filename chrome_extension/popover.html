@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printer Settings</title>
+    <style>
+        body { 
+            font-family: "Poppins", sans-serif; 
+            width: 300px; 
+            padding: 10px; 
+            background: #f4f4f4;
+        }
+        h1, h3 { 
+            text-align: center; 
+            color: #333; 
+        }
+        .toggle-container {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        input:checked + .slider {
+            background-color: #115027;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        button {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            background: #115027;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .payment-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .payment-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        select, input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 5px;
+        }
+        li {
+            padding: 5px;
+            font-size: 14px;
+            background: #e3f2fd;
+            border-radius: 3px;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: #115027;">Fiscalpy</h1>
+    <h3>🖨️ Printer Settings</h3>
+    <div>
+        <div style="display: flex; gap: 20px;">
+            <div>
+                <select id="port">
+                    <option>Port</option>
+                    <option value="COM1">COM 1</option>
+                    <option value="COM2">COM 2</option>
+                    <option value="COM3">COM 3</option>
+                    <option value="COM4">COM 4</option>
+                    <option value="COM5">COM 5</option>
+                    <option value="COM6">COM 6</option>
+                    <option value="COM7">COM 7</option>
+                    <option value="COM8">COM 8</option>
+                    <option value="COM9">COM 9</option>
+                </select>
+            </div>
+            <div>
+                <select id="baudrate">
+                    <option>Baudrate</option>
+                    <option value="300">300</option>
+                    <option value="600">600</option>
+                    <option value="1200">1200</option>
+                    <option value="2400">2400</option>
+                    <option value="4800">4800</option>
+                    <option value="9600">9600</option>
+                    <option value="14400">14400</option>
+                    <option value="19200">19200</option>
+                    <option value="38400">38400</option>
+                    <option value="57600">57600</option>
+                    <option value="115200">115200</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <button id="testPrinter">Test printer!</button>
+        </div>
+    </div>
+
+    <h3>📄 Receipt Settings</h3>
+    <div class="toggle-container">
+        <span>Print Copies</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="printCopies">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="toggle-container">
+        <span>Print on Page Load</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="printOnLoad">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <h4>💳 Payment Methods</h4>
+    <ul id="paymentList"></ul>
+    <div class="payment-container">
+        <div class="payment-row">
+            <select id="paymentKey">
+                <option value="P">Cash</option>
+                <option value="N">Card</option>
+                <option value="C">Cheque</option>
+            </select>
+            <input type="text" id="paymentName" placeholder="Enter method name">
+        </div>
+        <button id="addPayment">➕ Add Payment type</button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
