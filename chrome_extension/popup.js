@@ -38,7 +38,6 @@ portSelect.addEventListener("change", (event) => {
 
 testPrinterButton.addEventListener("click", () => {
     alert("Listen, The fiscal Printer will beep 4 times. Please confirm")
-
     chrome.runtime.sendMessage({ action: 'play-sound', playCount: 4 })
 })
 
@@ -61,18 +60,19 @@ addPaymentButton.addEventListener("click", () => {
 
     chrome.storage.local.get([K_PAYMENT_TYPES], (data) => {
         if (data?.[K_PAYMENT_TYPES]?.[name]) {
-            return alert("Key already exists");
+            return alert("Payment type already exists");
         }
         chrome.storage.local.set({ 
             [K_PAYMENT_TYPES]: {
-                ...data[K_PAYMENT_TYPES], [name]: key 
+                ...data[K_PAYMENT_TYPES], 
+                [name]: key 
             } 
-        }).then(() => {
-            addPaymentToList(key, name);
-            paymentNameInput.value = "";
-        }).catch((err) => {
-            console.error(err);
         })
+        .then(() => {
+            addPaymentToList(name, key)
+            paymentNameInput.value = ""
+        })
+        .catch((err) => console.error(err))
     });
 });
 
@@ -80,18 +80,19 @@ addPaymentButton.addEventListener("click", () => {
 function addPaymentToList(key, name) {
     const li = document.createElement("li");
     li.onclick = () => {
-        if (confirm(`Are you sure you want to delete payment type: ${key}`)) {
-            chrome.storage.local.get([K_PAYMENT_TYPES], (conf) => {
-                const paymentTypes = conf?.[K_PAYMENT_TYPES] ?? {}
-                delete paymentTypes[key]
-                chrome.storage.local.set({ [K_PAYMENT_TYPES]: paymentTypes })
-                    .then(() => li.remove())
-                    .catch((e) => {
-                        alert("Error deleting payment type")
-                        console.error(e)
-                    })
-            })
+        if (!confirm(`Are you sure you want to delete payment type: ${key}`)) {
+            return
         }
+        chrome.storage.local.get([K_PAYMENT_TYPES], (conf) => {
+            const paymentTypes = conf?.[K_PAYMENT_TYPES] ?? {}
+            delete paymentTypes[key]
+            chrome.storage.local.set({ [K_PAYMENT_TYPES]: paymentTypes })
+                .then(() => li.remove())
+                .catch((e) => {
+                    alert("Error deleting payment type")
+                    console.error(e)
+                })
+        })
     }
     li.textContent = `❌ ${key}: ${name}`;
     paymentList.appendChild(li);
