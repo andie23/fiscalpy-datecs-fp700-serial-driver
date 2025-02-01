@@ -79,7 +79,21 @@ addPaymentButton.addEventListener("click", () => {
 // Helper function to add to UI
 function addPaymentToList(key, name) {
     const li = document.createElement("li");
-    li.textContent = `🔑 ${key}: ${name}`;
+    li.onclick = () => {
+        if (confirm(`Are you sure you want to delete payment type: ${key}`)) {
+            chrome.storage.local.get([K_PAYMENT_TYPES], (conf) => {
+                const paymentTypes = conf?.[K_PAYMENT_TYPES] ?? {}
+                delete paymentTypes[key]
+                chrome.storage.local.set({ [K_PAYMENT_TYPES]: paymentTypes })
+                    .then(() => li.remove())
+                    .catch((e) => {
+                        alert("Error deleting payment type")
+                        console.error(e)
+                    })
+            })
+        }
+    }
+    li.textContent = `❌ ${key}: ${name}`;
     paymentList.appendChild(li);
 }
 
