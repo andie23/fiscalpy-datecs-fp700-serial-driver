@@ -19,7 +19,16 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     });
 
     port.onDisconnect.addListener(() => {
-        console.error("Failed to connect: " + chrome.runtime.lastError.message);
+        const error = chrome.runtime.lastError.message
+        console.error("Failed to connect: " + error);
+        if (/host not found/i.test(error)) {
+            chrome.tabs.sendMessage(
+                sender.tab.id, { 
+                    origin: message, 
+                    error: "Printer driver not found on your computer!!"
+                }
+            )   
+        }
     });
 
     console.log('Sending message to port')
