@@ -21,6 +21,14 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     port.onDisconnect.addListener(() => {
         const error = chrome.runtime.lastError.message
         console.error("Failed to connect: " + error);
+        if (/forbidden/i.test(error)) {
+            chrome.tabs.sendMessage(
+                sender.tab.id, { 
+                    origin: message, 
+                    error
+                }
+            )
+        }
         if (/host not found/i.test(error)) {
             chrome.tabs.sendMessage(
                 sender.tab.id, { 
