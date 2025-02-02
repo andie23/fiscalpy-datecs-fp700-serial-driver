@@ -25,7 +25,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=C:\AppBuilds\Fiscalpy
-OutputBaseFilename=stdioFp700
+OutputBaseFilename=fp700Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -38,6 +38,7 @@ Source: "C:\Projects\fiscalpy-platform\fp700\dist\{#MyAppExeName}"; DestDir: "{a
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; Package the manifest file
 Source: "C:\Projects\fiscalpy-platform\fp700\fiscalpy_chrome_manifest.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Projects\fiscalpy-platform\chrome_extension\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
