@@ -257,13 +257,14 @@ window.addEventListener('load', () => {
     const observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             // A new receipt screen has been added
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === 1 && node.classList.contains(RECEIPT_SCREEN_CLASS)) {
-                        init(node)
-                    }
-                });
+            if (mutation.type != 'childList') {
+                continue
             }
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && node.classList.contains(RECEIPT_SCREEN_CLASS)) {
+                    init(node)
+                }
+            });
         }
     });
     // Start observing the target node for configured mutations
