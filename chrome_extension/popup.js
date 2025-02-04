@@ -3,6 +3,7 @@ const K_PRINT_ON_LOAD = 'printOnload'
 const K_PRINT_COPY = 'printCopy'
 const K_PORT = 'port'
 const K_BAUDRATE = 'baudrate'
+const K_NEW_ORDER_ON_PRINT = 'newOrderOnPrint'
 
 const printCopiesToggle = document.getElementById("printCopies");
 const printOnLoadToggle = document.getElementById("printOnLoad");
@@ -13,11 +14,13 @@ const paymentList = document.getElementById("paymentList");
 const baudRateSelect = document.getElementById("baudrate")
 const portSelect = document.getElementById("port")
 const testPrinterButton = document.getElementById("testPrinter")
+const newOrderAfterPrintingToggle = document.getElementById("newOrderAfterPrinting")
 
 // Load saved settings
-chrome.storage.local.get([K_PORT, K_BAUDRATE, K_PRINT_ON_LOAD, K_PAYMENT_TYPES, K_PRINT_COPY], (data) => {
+chrome.storage.local.get([K_NEW_ORDER_ON_PRINT, K_PORT, K_BAUDRATE, K_PRINT_ON_LOAD, K_PAYMENT_TYPES, K_PRINT_COPY], (data) => {
     printCopiesToggle.checked = data[K_PRINT_COPY] || false;
     printOnLoadToggle.checked = data[K_PRINT_ON_LOAD] || false;
+    newOrderAfterPrintingToggle.checked = data[K_NEW_ORDER_ON_PRINT] || false;
     portSelect.value = data.port
     baudRateSelect.value = data.baudrate
 
@@ -40,6 +43,10 @@ testPrinterButton.addEventListener("click", () => {
     alert("Listen, The fiscal Printer will beep 4 times. Please confirm")
     chrome.runtime.sendMessage({ action: 'play-sound', playCount: 4 })
 })
+
+newOrderAfterPrintingToggle.addEventListener("change", () => {
+    chrome.storage.local.set({ [K_NEW_ORDER_ON_PRINT]: newOrderAfterPrintingToggle.checked })
+}) 
 
 // Save print copies toggle
 printCopiesToggle.addEventListener("change", () => {

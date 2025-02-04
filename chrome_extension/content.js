@@ -7,6 +7,7 @@ const K_PRINT_COPY = 'printCopy'
 const K_PORT = 'port'
 const K_BAUDRATE = 'baudrate'
 const K_ORDER_NUMBERS = 'savedOrderNumbers'
+const K_NEW_ORDER_ON_PRINT = 'newOrderOnPrint'
 
 /**
  * Listen for messages from the background script
@@ -14,7 +15,16 @@ const K_ORDER_NUMBERS = 'savedOrderNumbers'
 chrome.runtime.onMessage.addListener((message) => {
     if (message.origin.action === 'print-receipt') {
         // Print went through successfully
-        if (message.ok) updateOrderNumber(message.origin.receipt.order_number)
+        if (message.ok) {
+            updateOrderNumber(message.origin.receipt.order_number)
+            // Redirect to a new orders page when 
+            chrome.storage.local.get([K_NEW_ORDER_ON_PRINT], (data) => {
+                if (!data[K_NEW_ORDER_ON_PRINT]) return
+                const newOrderBtn = Array.from(document.querySelectorAll('.button'))
+                    .find(el => el.textContent.trim() === 'New Order')
+                if (newOrderBtn) newOrderBtn.click()
+            })
+        } 
 
         // Print failed
         if (message.error) alert(message.error)
