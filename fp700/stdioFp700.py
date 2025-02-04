@@ -126,6 +126,9 @@ def execute_from_message(message):
     if action == 'version-info':
         write_message({ "ok": True, "version-info": f"Fiscalpy {version.SYSTEM_VERSION}" })
 
+    if action == 'get-all-settings':
+        write_message({ "ok": True, "config": config.read_config() })
+
 if __name__ == '__main__':
     try:
         message = read_message()
