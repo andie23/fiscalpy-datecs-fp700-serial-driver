@@ -4,7 +4,7 @@
 3. Using the Innosetup GUI, compile exe file
 4. Run setup file / distribute
 
-## Chrome Extension setup
+## Chrome Extension setup 
 1. Enable developer mode
 2. Load Unpacked Extension
 3. Select installation folder in "C:\ProgramData\Fiscalpy\"
