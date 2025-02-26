@@ -14,7 +14,7 @@ This project was originally developed to be a datecs fp700 serial driver Driver
 4. Copy the extension ID after it's successfully loaded
 5. Edit the "fiscalpy_chrome_manifest.json" file with extension id
 
-#TODO
+# TODO
 Add more to documentation
 
 # Reference product Links
